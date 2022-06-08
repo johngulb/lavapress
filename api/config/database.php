@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Str;
 
+global $table_prefix;
+
 return [
 
     /*
@@ -54,7 +56,7 @@ return [
             'unix_socket' => env('DB_SOCKET', ''),
             'charset' => 'utf8mb4',
             'collation' => 'utf8mb4_unicode_ci',
-            'prefix' => '',
+            'prefix' => $table_prefix,
             'prefix_indexes' => true,
             'strict' => true,
             'engine' => null,
