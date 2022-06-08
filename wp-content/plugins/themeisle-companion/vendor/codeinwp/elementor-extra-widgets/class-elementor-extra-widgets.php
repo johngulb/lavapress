@@ -24,7 +24,7 @@ if ( ! class_exists( '\ThemeIsle\ElementorExtraWidgets' ) ) {
 		 * The version of this library
 		 * @var string
 		 */
-		public static $version = '1.0.3';
+		public static $version = '1.0.6';
 
 		/**
 		 * Defines the library behaviour
@@ -43,6 +43,14 @@ if ( ! class_exists( '\ThemeIsle\ElementorExtraWidgets' ) ) {
 			if ( ! defined( 'EAW_PRO_VERSION' ) ) {
 				add_action( 'elementor/editor/after_enqueue_scripts', array( $this, 'enqueue_sidebar_css' ) );
 			}
+
+			// Ensure Font Awesome is always enqeued
+			add_action(
+				'elementor/editor/after_enqueue_styles',
+				function() {
+					wp_enqueue_style( 'font-awesome' );
+				}
+			);
 		}
 
 		/**
@@ -54,7 +62,7 @@ if ( ! class_exists( '\ThemeIsle\ElementorExtraWidgets' ) ) {
 
 			$category_args = apply_filters( 'elementor_extra_widgets_category_args', array(
 				'slug'  => 'obfx-elementor-widgets',
-				'title' => __( 'Orbit Fox Addons', 'textdomain' ),
+				'title' => __( 'Orbit Fox Addons', 'themeisle-companion' ),
 				'icon'  => 'fa fa-plug',
 			) );
 
@@ -62,7 +70,7 @@ if ( ! class_exists( '\ThemeIsle\ElementorExtraWidgets' ) ) {
 			$elements_manager->add_category(
 				$category_args['slug'] . '-pro',
 				array(
-					'title' => 'Premium ' . $category_args['title'],
+					'title' => 'Neve PRO Addon Widgets',
 					'icon'  => $category_args['slug'],
 				)
 			);
@@ -81,19 +89,20 @@ if ( ! class_exists( '\ThemeIsle\ElementorExtraWidgets' ) ) {
 		 */
 		public function register_styles() {
 			wp_register_style( 'eaw-elementor', plugins_url( '/css/public.css', __FILE__ ), array(), $this::$version );
-			wp_register_style( 'font-awesome-5-all', ELEMENTOR_ASSETS_URL . 'lib/font-awesome/css/all.min.css', false, $this::$version );
+			wp_register_style( 'font-awesome-5', ELEMENTOR_ASSETS_URL . 'lib/font-awesome/css/all.min.css', false, $this::$version );
 		}
 
 		/**
 		 * Register js scripts.
 		 */
 		public function register_scripts() {
-			wp_register_script( 'obfx-grid-js', plugins_url( '/js/obfx-grid.js', __FILE__ ), array(), $this::$version, true );
+			wp_register_script( 'obfx-grid-js', plugins_url( '/js/obfx-grid.js', __FILE__ ), array( 'jquery' ), $this::$version, true );
 		}
 
 		public function enqueue_sidebar_css() {
 			wp_enqueue_style( 'eaw-elementor-admin', plugins_url( '/css/admin.css', __FILE__ ), array(), $this::$version );
 		}
+
 		/**
 		 * Require and instantiate Elementor Widgets and Premium Placeholders.
 		 *
@@ -119,10 +128,10 @@ if ( ! class_exists( '\ThemeIsle\ElementorExtraWidgets' ) ) {
 				}
 			}
 
-			if ( apply_filters( 'eaw_should_load_placeholders', false ) ) {
+            if( class_exists( 'Elementor_Widgets_OBFX_Module', false ) && \Elementor_Widgets_OBFX_Module::should_add_placeholders() ){
 				$placeholders = $this->get_dir_files( __DIR__ . '/widgets/elementor/placeholders' );
 				foreach ( $placeholders as $widget ) {
-					require_once $widget;
+                    require_once $widget;
 				}
 
 				do_action( 'eaw_before_pro_widgets', $placeholders, $widgets_manager );
@@ -260,7 +269,7 @@ if ( ! class_exists( '\ThemeIsle\ElementorExtraWidgets' ) ) {
 		 */
 		public function __clone() {
 			// Cloning instances of the class is forbidden.
-			_doing_it_wrong( __FUNCTION__, esc_html__( 'Cheatin&#8217; huh?', 'textdomain' ), '1.0.0' );
+			_doing_it_wrong( __FUNCTION__, esc_html__( 'Cheatin&#8217; huh?', 'themeisle-companion' ), '1.0.0' );
 		}
 
 		/**
@@ -272,7 +281,7 @@ if ( ! class_exists( '\ThemeIsle\ElementorExtraWidgets' ) ) {
 		 */
 		public function __wakeup() {
 			// Unserializing instances of the class is forbidden.
-			_doing_it_wrong( __FUNCTION__, esc_html__( 'Cheatin&#8217; huh?', 'textdomain' ), '1.0.0' );
+			_doing_it_wrong( __FUNCTION__, esc_html__( 'Cheatin&#8217; huh?', 'themeisle-companion' ), '1.0.0' );
 		}
 	}
 }

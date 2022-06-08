@@ -106,7 +106,10 @@ class Product {
 	 * @var string $version The product version.
 	 */
 	private $version;
-
+	/**
+	 * Root api endpoint.
+	 */
+	const API_URL = 'https://api.themeisle.com/';
 	/**
 	 * ThemeIsle_SDK_Product constructor.
 	 *
@@ -154,7 +157,7 @@ class Product {
 	 *
 	 * @return string $name         The normalized string.
 	 */
-	static function key_ready_name( $string ) {
+	public static function key_ready_name( $string ) {
 		return str_replace( '-', '_', strtolower( trim( $string ) ) );
 	}
 

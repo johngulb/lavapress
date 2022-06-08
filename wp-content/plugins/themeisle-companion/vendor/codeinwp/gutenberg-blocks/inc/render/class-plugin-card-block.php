@@ -14,7 +14,6 @@ use ThemeIsle\GutenbergBlocks\Base_Block;
  */
 class Plugin_Card_Block extends Base_Block {
 
-
 	/**
 	 * Every block needs a slug, so we need to define one and assign it to the `$this->block_slug` property
 	 *
@@ -31,7 +30,10 @@ class Plugin_Card_Block extends Base_Block {
 	 */
 	protected function set_attributes() {
 		$this->attributes = array(
-			'slug' => array(
+			'slug'      => array(
+				'type' => 'string',
+			),
+			'className' => array(
 				'type' => 'string',
 			),
 		);
@@ -48,6 +50,10 @@ class Plugin_Card_Block extends Base_Block {
 	 * @return mixed|string
 	 */
 	protected function render( $attributes ) {
+		if ( empty( $attributes['slug'] ) ) {
+			return;
+		}
+
 		$results = $this->search( $attributes['slug'] );
 
 		if ( ! is_wp_error( $results['data'] ) ) {
@@ -92,25 +98,25 @@ class Plugin_Card_Block extends Base_Block {
 					<div class="wp-block-themeisle-blocks-plugin-cards-details">
 						<div class="wp-block-themeisle-blocks-plugin-cards-description">' . esc_html( $results->short_description ) . '</div>
 						<div class="wp-block-themeisle-blocks-plugin-cards-stats">
-							<h5>' . __( 'Plugin Stats', 'textdomain' ) . '</h5>
+							<h5>' . __( 'Plugin Stats', 'otter-blocks', 'themeisle-companion' ) . '</h5>
 							<div class="wp-block-themeisle-blocks-plugin-cards-stats-list">
 								<div class="wp-block-themeisle-blocks-plugin-cards-stat">
 									<span class="wp-block-themeisle-blocks-plugin-cards-text-large">' . number_format( $results->active_installs ) . '+</span>
-									' . __( 'active installs', 'textdomain' ) . '
+									' . __( 'active installs', 'otter-blocks', 'themeisle-companion' ) . '
 								</div>
 								<div class="wp-block-themeisle-blocks-plugin-cards-stat">
 									<span class="wp-block-themeisle-blocks-plugin-cards-text-large">' . floatval( $results->version ) . '+</span>
-									' . __( 'version', 'textdomain' ) . '
+									' . __( 'version', 'otter-blocks', 'themeisle-companion' ) . '
 								</div>
 								<div class="wp-block-themeisle-blocks-plugin-cards-stat">
 									<span class="wp-block-themeisle-blocks-plugin-cards-text-large">' . floatval( $results->tested ) . '+</span>
-									' . __( 'tested up to', 'textdomain' ) . '
+									' . __( 'tested up to', 'otter-blocks', 'themeisle-companion' ) . '
 								</div>
 							</div>
 						</div>
 					</div>
 					<div class="wp-block-themeisle-blocks-plugin-cards-download">
-						<a href="' . esc_url( $results->download_link ) . '">' . __( 'Download', 'textdomain' ) . '</a>
+						<a href="' . esc_url( $results->download_link ) . '">' . __( 'Download', 'otter-blocks', 'themeisle-companion' ) . '</a>
 					</div>
 				</div>
 			</div>';
@@ -132,7 +138,7 @@ class Plugin_Card_Block extends Base_Block {
 	protected function search( $request ) {
 		$return = array(
 			'success' => false,
-			'data'    => esc_html__( 'Something went wrong', 'textdomain' ),
+			'data'    => esc_html__( 'Something went wrong', 'otter-blocks', 'themeisle-companion' ),
 		);
 
 		$slug = $request;

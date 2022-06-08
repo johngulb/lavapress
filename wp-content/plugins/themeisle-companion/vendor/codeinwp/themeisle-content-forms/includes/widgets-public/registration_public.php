@@ -33,12 +33,10 @@ class Registration_Public extends Widget_Actions_Base {
 	 */
 	public function rest_submit_form( $return, $data, $widget_id, $post_id, $builder ) {
 		if ( empty( $data['USER_EMAIL'] ) || ! is_email( $data['USER_EMAIL'] ) ) {
-			$return['message'] = esc_html__( 'Invalid email.', 'textdomain' );
+			$return['message'] = esc_html__( 'Invalid email.', 'themeisle-companion' );
 
 			return $return;
 		}
-
-		$widget_settings = $this->get_widget_settings( $widget_id, $post_id, $builder );
 
 		$settings['user_email']             = sanitize_email( $data['USER_EMAIL'] );
 		$settings['user_login']             = ! empty( $data['USER_LOGIN'] ) ? $data['USER_LOGIN'] : $data['email'];
@@ -49,7 +47,7 @@ class Registration_Public extends Widget_Actions_Base {
 		$settings['display_name'] = ! empty( $data['DISPLAY_NAME'] ) ? $data['DISPLAY_NAME'] : '';
 		$settings['first_name']   = ! empty( $data['FIRST_NAME'] ) ? $data['FIRST_NAME'] : '';
 		$settings['last_name']    = ! empty( $data['LAST_NAME'] ) ? $data['LAST_NAME'] : '';
-		$settings['role']         = array_key_exists( 'user_role', $widget_settings ) ? $widget_settings['user_role'] : 'subscriber';
+		$settings['role']         = apply_filters( 'ti_content_forms_registration_form', 'subscriber', $widget_id, $post_id );
 
 		$return = $this->_register_user( $return, $settings );
 
@@ -67,25 +65,25 @@ class Registration_Public extends Widget_Actions_Base {
 	private function _register_user( $return, $settings ) {
 
 		if ( ! get_option( 'users_can_register' ) ) {
-			$return['message'] = esc_html__( 'This website does not allow registrations at this moment!' );
+			$return['message'] = esc_html__( 'This website does not allow registrations at this moment!', 'themeisle-companion' );
 
 			return $return;
 		}
 
 		if ( ! validate_username( $settings['user_login'] ) ) {
-			$return['message'] = esc_html__( 'Invalid user name' );
+			$return['message'] = esc_html__( 'Invalid user name', 'themeisle-companion' );
 
 			return $return;
 		}
 
 		if ( username_exists( $settings['user_login'] ) ) {
-			$return['message'] = esc_html__( 'Username already exists' );
+			$return['message'] = esc_html__( 'Username already exists', 'themeisle-companion' );
 
 			return $return;
 		}
 
 		if ( email_exists( $settings['user_email'] ) ) {
-			$return['message'] = esc_html__( 'This email is already registered' );
+			$return['message'] = esc_html__( 'This email is already registered', 'themeisle-companion' );
 			return $return;
 		}
 
@@ -100,7 +98,7 @@ class Registration_Public extends Widget_Actions_Base {
 			}
 
 			$return['success'] = true;
-			$return['message'] = esc_html__( 'Welcome, ', 'textdomain' ) . $settings['user_login'] . '!';
+			$return['message'] = esc_html__( 'Welcome, ', 'themeisle-companion' ) . $settings['user_login'] . '!';
 		}
 
 		return $return;

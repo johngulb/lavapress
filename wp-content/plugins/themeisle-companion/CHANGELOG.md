@@ -1,3 +1,156 @@
+##### [Version 2.10.12](https://github.com/Codeinwp/themeisle-companion/compare/v2.10.11...v2.10.12) (2022-05-27)
+
+- [Fix] Accessibility issue on social links.
+- [Fix] PHP 8 deprecation warning from uksort function.
+- [Fix] The policy notice can't be dismissed on cached website.
+
+##### [Version 2.10.11](https://github.com/Codeinwp/themeisle-companion/compare/v2.10.10...v2.10.11) (2022-02-17)
+
+- Replace the templates module with the one based on Neve and Cloud Templates & Patterns collection
+- Fix warnings with PHP 8
+- Update recommended plugins
+
+##### [Version 2.10.10](https://github.com/Codeinwp/themeisle-companion/compare/v2.10.9...v2.10.10) (2021-12-23)
+
+- Fix error with gutenberg-blocks
+
+##### [Version 2.10.9](https://github.com/Codeinwp/themeisle-companion/compare/v2.10.8...v2.10.9) (2021-12-23)
+
+- Improve cookie policy loading
+- Improve upsells when the plugin is used with Neve theme to better inform the possibilities from pro
+
+##### [Version 2.10.8](https://github.com/Codeinwp/themeisle-companion/compare/v2.10.7...v2.10.8) (2021-09-29)
+
+- [Feat] Refactor the dashboard.
+- [Feat] Add Telegram social sharing icon.
+- [Fix] HomePage reverts to FrontPage if you have Orbit Fox Hestia Enhancements active and switch theme
+
+##### [Version 2.10.7](https://github.com/Codeinwp/themeisle-companion/compare/v2.10.6...v2.10.7) (2021-08-02)
+
+[Fix] Widgets with repeater fields are generating errors
+[Fix] Gutenberg Blocks compatibility with WP 5.8
+[Fix] Fix Elementor deprecated functions
+- Retire the Uptime Monitor module.
+- Announce the retirement of the Gutenberg Blocks module and remove it if the module is not used.
+- Retire the Analytics module if the user is not using it.
+
+##### [Version 2.10.6](https://github.com/Codeinwp/themeisle-companion/compare/v2.10.5...v2.10.6) (2021-05-31)
+
+- [Fix] Replace Elementor deprecated functions
+
+##### [Version 2.10.5](https://github.com/Codeinwp/themeisle-companion/compare/v2.10.4...v2.10.5) (2021-05-31)
+
+- [Fix] PHP 8 errors
+- [Fix] Elementor deprecated functions
+
+##### [Version 2.10.4](https://github.com/Codeinwp/themeisle-companion/compare/v2.10.3...v2.10.4) (2021-03-09)
+
+- [Fix] Translations and text-domain issues
+- [Fix] Translation and text-domain issues.
+
+##### [Version 2.10.3](https://github.com/Codeinwp/themeisle-companion/compare/v2.10.2...v2.10.3) (2020-12-17)
+
+[Fix] removes role selector from registration content form
+[Fix] ThemeIsle icons not appearing on WebKit browsers in Gutenberg blocks
+
+##### [Version 2.10.2](https://github.com/Codeinwp/themeisle-companion/compare/v2.10.1...v2.10.2) (2020-12-09)
+
+- [Fix] Fatal error on older versions of PHP
+
+##### [Version 2.10.1](https://github.com/Codeinwp/themeisle-companion/compare/v2.10.0...v2.10.1) (2020-12-07)
+
+- [Feat] New ascending/descending order option for Post Type Grid Elementor widget
+- [Fix] Compatibility with WP 5.6
+- [Fix] Header and Footer scripts not working on the Shop page
+- [Fix] Remove Google Plus from the social-sharing module
+
+#### [Version 2.10.0](https://github.com/Codeinwp/themeisle-companion/compare/v2.9.19...v2.10.0) (2020-10-09)
+
+- New Custom Fonts module
+
+##### [Version 2.9.19](https://github.com/Codeinwp/themeisle-companion/compare/v2.9.18...v2.9.19) (2020-09-25)
+
+* Fix elementor post grid jQuery dependencies
+
+##### [Version 2.9.18](https://github.com/Codeinwp/themeisle-companion/compare/v2.9.17...v2.9.18) (2020-09-21)
+
+- [Fix] Missing FontAwesome icons when Otter Blocks plugin was active
+
+##### [Version 2.9.17](https://github.com/Codeinwp/themeisle-companion/compare/v2.9.16...v2.9.17) (2020-09-02)
+
+- [Fix] Compatibility with WP 5.5
+- [Fix] Installing recommended plugins not working
+
+##### [Version 2.9.16](https://github.com/Codeinwp/themeisle-companion/compare/v2.9.15...v2.9.16) (2020-08-12)
+
+fix: add permission_callback for analytics module
+
+##### [Version 2.9.15](https://github.com/Codeinwp/themeisle-companion/compare/v2.9.14...v2.9.15) (2020-08-12)
+
+fix: notice showing up in the editor on the new WordPress version for users with WP_DEBUG turned on
+
+##### [Version 2.9.14](https://github.com/Codeinwp/themeisle-companion/compare/v2.9.13...v2.9.14) (2020-08-07)
+
+- Remove affiliate link
+
+##### [Version 2.9.13](https://github.com/Codeinwp/themeisle-companion/compare/v2.9.12...v2.9.13) (2020-08-04)
+
+- Removed Starter Sites library and import process used for the Neve theme
+- [Fix] Menu Icons module not working with WP 5.5
+- [Fix] Empty team member widget appearing on mobile in Hestia theme
+
+##### [Version 2.9.12](https://github.com/Codeinwp/themeisle-companion/compare/v2.9.11...v2.9.12) (2020-07-20)
+
+- New checkbox field in the Contact widget for both Elementor and Beaver Builder
+- [Fix] Newsletter widget not taking into account the double opt-in option from Mailchimp
+
+##### [Version 2.9.11](https://github.com/Codeinwp/themeisle-companion/compare/v2.9.10...v2.9.11) (2020-07-10)
+
+- Starter Sites library and import process from the Neve theme
+
+##### [Version 2.9.10](https://github.com/Codeinwp/themeisle-companion/compare/v2.9.9...v2.9.10) (2020-06-24)
+
+- [Fix] JS error for some modules when the module names are translated
+
+##### [Version 2.9.9](https://github.com/Codeinwp/themeisle-companion/compare/v2.9.8...v2.9.9) (2020-06-05)
+
+New Header/Footer Scripts module
+
+##### [Version 2.9.8](https://github.com/Codeinwp/themeisle-companion/compare/v2.9.7...v2.9.8) (2020-04-28)
+
+- Fixed importing multiple photos and better error handling in the Mystock module
+
+##### [Version 2.9.7](https://github.com/Codeinwp/themeisle-companion/compare/v2.9.6...v2.9.7) (2020-04-22)
+
+- New Hidden field in the contact form widget
+- Fix Mystock Import in the Gutenberg editor
+- Fix overlapping widgets names with Beaver Builder Pro version
+- Fix undefined index notice in Elementor Services widget
+- Upgrade FontAwesome icons to FA5 for Hestia default content
+- Make inline social icons round in Hestia
+- Fix inline social icons not applying on pages in Hestia
+
+##### [Version 2.9.6](https://github.com/Codeinwp/themeisle-companion/compare/v2.9.5...v2.9.6) (2020-04-06)
+
+* Update compatibility with WordPress 5.4 
+* Sync dependencies
+* Fix selective refresh for Hestia enhacements features
+
+##### [Version 2.9.5](https://github.com/Codeinwp/themeisle-companion/compare/v2.9.4...v2.9.5) (2020-03-30)
+
+* Fix notice on analytics module when the codes are missing
+* Update dependencies to the latest versions
+
+##### [Version 2.9.4](https://github.com/Codeinwp/themeisle-companion/compare/v2.9.3...v2.9.4) (2020-03-23)
+
+* Improve FA loading in Hestia compatibility features
+* Update dependencies
+
+##### [Version 2.9.3](https://github.com/Codeinwp/themeisle-companion/compare/v2.9.2...v2.9.3) (2020-03-05)
+
+* Update dependencies
+* Fix admin notice viewed by non-admins
+
 ##### [Version 2.9.2](https://github.com/Codeinwp/themeisle-companion/compare/v2.9.1...v2.9.2) (2020-02-13)
 
 * Fix issue with cookie notices closing behavior. 

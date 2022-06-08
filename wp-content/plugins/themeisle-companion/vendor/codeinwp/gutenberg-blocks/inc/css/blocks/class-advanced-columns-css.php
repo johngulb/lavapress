@@ -9,6 +9,8 @@ namespace ThemeIsle\GutenbergBlocks\CSS\Blocks;
 
 use ThemeIsle\GutenbergBlocks\Base_CSS;
 
+use ThemeIsle\GutenbergBlocks\CSS\CSS_Utility;
+
 /**
  * Class Advanced_Columns_CSS
  */
@@ -21,7 +23,6 @@ class Advanced_Columns_CSS extends Base_CSS {
 	 */
 	public $block_prefix = 'advanced-columns';
 
-
 	/**
 	 * Generate Advanced Columns CSS
 	 *
@@ -31,179 +32,937 @@ class Advanced_Columns_CSS extends Base_CSS {
 	 * @access  public
 	 */
 	public function render_css( $block ) {
-		$attr  = $block['attrs'];
-		$style = '';
+		$css = new CSS_Utility( $block );
 
-		if ( isset( $attr['id'] ) ) {
-			$style .= '#' . $attr['id'] . ' {' . "\n";
-			if ( 'linked' === $this->get_attr_value( ( isset( $attr['paddingType'] ) ? $attr['paddingType'] : null ), 'linked' ) ) {
-				$style .= '	padding: ' . $this->get_attr_value( ( isset( $attr['padding'] ) ? $attr['padding'] : null ), 20 ) . 'px;' . "\n";
-			}
+		$css->add_item(
+			array(
+				'properties' => array(
+					array(
+						'property'  => 'padding',
+						'value'     => 'padding',
+						'unit'      => 'px',
+						'default'   => 20,
+						'condition' => function( $attrs ) {
+							return ! ( isset( $attrs['paddingType'] ) && 'unlinked' === $attrs['paddingType'] );
+						},
+					),
+					array(
+						'property'  => 'padding-top',
+						'value'     => 'paddingTop',
+						'unit'      => 'px',
+						'default'   => 20,
+						'condition' => function( $attrs ) {
+							return isset( $attrs['paddingType'] ) && 'unlinked' === $attrs['paddingType'];
+						},
+					),
+					array(
+						'property'  => 'padding-right',
+						'value'     => 'paddingRight',
+						'unit'      => 'px',
+						'default'   => 20,
+						'condition' => function( $attrs ) {
+							return isset( $attrs['paddingType'] ) && 'unlinked' === $attrs['paddingType'];
+						},
+					),
+					array(
+						'property'  => 'padding-bottom',
+						'value'     => 'paddingBottom',
+						'unit'      => 'px',
+						'default'   => 20,
+						'condition' => function( $attrs ) {
+							return isset( $attrs['paddingType'] ) && 'unlinked' === $attrs['paddingType'];
+						},
+					),
+					array(
+						'property'  => 'padding-left',
+						'value'     => 'paddingLeft',
+						'unit'      => 'px',
+						'default'   => 20,
+						'condition' => function( $attrs ) {
+							return isset( $attrs['paddingType'] ) && 'unlinked' === $attrs['paddingType'];
+						},
+					),
+					array(
+						'property'  => 'margin-top',
+						'value'     => 'margin',
+						'unit'      => 'px',
+						'default'   => 20,
+						'condition' => function( $attrs ) {
+							return isset( $attrs['marginType'] ) && 'linked' === $attrs['marginType'];
+						},
+					),
+					array(
+						'property'  => 'margin-bottom',
+						'value'     => 'margin',
+						'unit'      => 'px',
+						'default'   => 20,
+						'condition' => function( $attrs ) {
+							return isset( $attrs['marginType'] ) && 'linked' === $attrs['marginType'];
+						},
+					),
+					array(
+						'property'  => 'margin-top',
+						'value'     => 'marginTop',
+						'unit'      => 'px',
+						'default'   => 20,
+						'condition' => function( $attrs ) {
+							return ! ( isset( $attrs['marginType'] ) && 'linked' === $attrs['marginType'] );
+						},
+					),
+					array(
+						'property'  => 'margin-bottom',
+						'value'     => 'marginBottom',
+						'unit'      => 'px',
+						'default'   => 20,
+						'condition' => function( $attrs ) {
+							return ! ( isset( $attrs['marginType'] ) && 'linked' === $attrs['marginType'] );
+						},
+					),
+					array(
+						'property' => 'justify-content',
+						'value'    => 'horizontalAlign',
+						'default'  => 'unset',
+					),
+					array(
+						'property'  => 'min-height',
+						'value'     => 'columnsHeight',
+						'default'   => 'auto',
+						'condition' => function( $attrs ) {
+							return ! isset( $attrs['columnsHeight'] ) || 'custom' !== $attrs['columnsHeight'];
+						},
+					),
+					array(
+						'property'  => 'min-height',
+						'value'     => 'columnsHeightCustom',
+						'unit'      => 'px',
+						'condition' => function( $attrs ) {
+							return isset( $attrs['columnsHeight'] ) && 'custom' === $attrs['columnsHeight'];
+						},
+					),
+					array(
+						'property'  => 'background',
+						'value'     => 'backgroundColor',
+						'condition' => function( $attrs ) {
+							return ! ( isset( $attrs['backgroundType'] ) && 'color' !== $attrs['backgroundType'] );
+						},
+					),
+					array(
+						'property'       => 'background',
+						'pattern'        => 'url( imageURL ) repeat attachment position/size',
+						'pattern_values' => array(
+							'imageURL'   => array(
+								'value' => 'backgroundImageURL',
+							),
+							'repeat'     => array(
+								'value'   => 'backgroundRepeat',
+								'default' => 'repeat',
+							),
+							'attachment' => array(
+								'value'   => 'backgroundAttachment',
+								'default' => 'scroll',
+							),
+							'position'   => array(
+								'value'   => 'backgroundPosition',
+								'default' => 'top left',
+							),
+							'size'       => array(
+								'value'   => 'backgroundSize',
+								'default' => 'auto',
+							),
+						),
+						'condition'      => function( $attrs ) {
+							return isset( $attrs['backgroundType'] ) && 'image' === $attrs['backgroundType'] && isset( $attrs['backgroundImageURL'] );
+						},
+					),
+					array(
+						'property'  => 'background',
+						'value'     => 'backgroundGradient',
+						'default'   => 'linear-gradient(90deg,rgba(54,209,220,1) 0%,rgba(91,134,229,1) 100%)',
+						'condition' => function( $attrs ) {
+							return isset( $attrs['backgroundType'] ) && 'gradient' === $attrs['backgroundType'] && isset( $attrs['backgroundGradient'] );
+						},
+					),
+					array(
+						'property'       => 'background',
+						'pattern'        => 'linear-gradient( angle, firstColor firstLocation, secondColor secondLocation )',
+						'pattern_values' => array(
+							'angle'          => array(
+								'value'   => 'backgroundGradientAngle',
+								'unit'    => 'deg',
+								'default' => 90,
+							),
+							'firstColor'     => array(
+								'value'   => 'backgroundGradientFirstColor',
+								'default' => '#36d1dc',
+							),
+							'firstLocation'  => array(
+								'value'   => 'backgroundGradientFirstLocation',
+								'unit'    => '%',
+								'default' => 0,
+							),
+							'secondColor'    => array(
+								'value'   => 'backgroundGradientSecondColor',
+								'default' => '#5b86e5',
+							),
+							'secondLocation' => array(
+								'value'   => 'backgroundGradientSecondLocation',
+								'unit'    => '%',
+								'default' => 100,
+							),
+						),
+						'condition'      => function( $attrs ) {
+							return isset( $attrs['backgroundType'] ) && 'gradient' === $attrs['backgroundType'] && ! isset( $attrs['backgroundGradient'] );
+						},
+					),
+					array(
+						'property'       => 'background',
+						'pattern'        => 'radial-gradient( at position, firstColor firstLocation, secondColor secondLocation )',
+						'pattern_values' => array(
+							'position'       => array(
+								'value'   => 'backgroundGradientPosition',
+								'default' => 'center center',
+							),
+							'firstColor'     => array(
+								'value'   => 'backgroundGradientFirstColor',
+								'default' => '#36d1dc',
+							),
+							'firstLocation'  => array(
+								'value'   => 'backgroundGradientFirstLocation',
+								'unit'    => '%',
+								'default' => 0,
+							),
+							'secondColor'    => array(
+								'value'   => 'backgroundGradientSecondColor',
+								'default' => '#5b86e5',
+							),
+							'secondLocation' => array(
+								'value'   => 'backgroundGradientSecondLocation',
+								'unit'    => '%',
+								'default' => 100,
+							),
+						),
+						'condition'      => function( $attrs ) {
+							return isset( $attrs['backgroundType'] ) && 'gradient' === $attrs['backgroundType'] && isset( $attrs['backgroundGradientType'] ) && 'radial' === $attrs['backgroundGradientType'];
+						},
+					),
+					array(
+						'property'       => 'border',
+						'pattern'        => 'width solid color',
+						'pattern_values' => array(
+							'width' => array(
+								'value'   => 'border',
+								'unit'    => 'px',
+								'default' => 0,
+							),
+							'color' => array(
+								'value'   => 'borderColor',
+								'default' => '#000000',
+							),
+						),
+						'condition'      => function( $attrs ) {
+							return ! ( isset( $attrs['borderType'] ) && 'unlinked' === $attrs['borderType'] );
+						},
+					),
+					array(
+						'property'       => 'border-width',
+						'pattern'        => 'top right bottom left',
+						'pattern_values' => array(
+							'top'    => array(
+								'value'   => 'borderTop',
+								'unit'    => 'px',
+								'default' => 0,
+							),
+							'right'  => array(
+								'value'   => 'borderRight',
+								'unit'    => 'px',
+								'default' => 0,
+							),
+							'bottom' => array(
+								'value'   => 'borderBottom',
+								'unit'    => 'px',
+								'default' => 0,
+							),
+							'left'   => array(
+								'value'   => 'borderLeft',
+								'unit'    => 'px',
+								'default' => 0,
+							),
+						),
+						'condition'      => function( $attrs ) {
+							return isset( $attrs['borderType'] ) && 'unlinked' === $attrs['borderType'];
+						},
+					),
+					array(
+						'property'  => 'border-style',
+						'default'   => 'solid',
+						'condition' => function( $attrs ) {
+							return isset( $attrs['borderType'] ) && 'unlinked' === $attrs['borderType'];
+						},
+					),
+					array(
+						'property'  => 'border-color',
+						'value'     => 'borderColor',
+						'default'   => '#000000',
+						'condition' => function( $attrs ) {
+							return isset( $attrs['borderType'] ) && 'unlinked' === $attrs['borderType'];
+						},
+					),
+					array(
+						'property'  => 'border-radius',
+						'value'     => 'borderRadius',
+						'unit'      => 'px',
+						'default'   => 0,
+						'condition' => function( $attrs ) {
+							return ! ( isset( $attrs['borderRadiusType'] ) && 'unlinked' === $attrs['borderRadiusType'] );
+						},
+					),
+					array(
+						'property'       => 'border-radius',
+						'pattern'        => 'top-left top-right bottom-right bottom-left',
+						'pattern_values' => array(
+							'top-left'     => array(
+								'value'   => 'borderRadiusTop',
+								'unit'    => 'px',
+								'default' => 0,
+							),
+							'top-right'    => array(
+								'value'   => 'borderRadiusRight',
+								'unit'    => 'px',
+								'default' => 0,
+							),
+							'bottom-right' => array(
+								'value'   => 'borderRadiusBottom',
+								'unit'    => 'px',
+								'default' => 0,
+							),
+							'bottom-left'  => array(
+								'value'   => 'borderRadiusLeft',
+								'unit'    => 'px',
+								'default' => 0,
+							),
+						),
+						'condition'      => function( $attrs ) {
+							return isset( $attrs['borderRadiusType'] ) && 'unlinked' === $attrs['borderRadiusType'];
+						},
+					),
+					array(
+						'property'       => 'box-shadow',
+						'pattern'        => 'horizontal vertical blur spread color',
+						'pattern_values' => array(
+							'horizontal' => array(
+								'value'   => 'boxShadowHorizontal',
+								'unit'    => 'px',
+								'default' => 0,
+							),
+							'vertical'   => array(
+								'value'   => 'boxShadowVertical',
+								'unit'    => 'px',
+								'default' => 0,
+							),
+							'blur'       => array(
+								'value'   => 'boxShadowBlur',
+								'unit'    => 'px',
+								'default' => 5,
+							),
+							'spread'     => array(
+								'value'   => 'boxShadowSpread',
+								'unit'    => 'px',
+								'default' => 1,
+							),
+							'color'      => array(
+								'value'   => 'boxShadowColor',
+								'default' => '#000',
+								'format'  => function( $value, $attrs ) {
+									$opacity = ( isset( $attrs['boxShadowColorOpacity'] ) ? $attrs['boxShadowColorOpacity'] : 50 ) / 100;
+									return $this->hex2rgba( $value, $opacity );
+								},
+							),
+						),
+						'condition'      => function( $attrs ) {
+							return isset( $attrs['boxShadow'] ) && true === $attrs['boxShadow'];
+						},
+					),
+				),
+			)
+		);
 
-			if ( 'unlinked' === $this->get_attr_value( ( isset( $attr['paddingType'] ) ? $attr['paddingType'] : null ), 'linked' ) ) {
-				$style .= '	padding-top: ' . $this->get_attr_value( ( isset( $attr['paddingTop'] ) ? $attr['paddingTop'] : null ), 20 ) . 'px;' . "\n";
-				$style .= '	padding-right: ' . $this->get_attr_value( ( isset( $attr['paddingRight'] ) ? $attr['paddingRight'] : null ), 20 ) . 'px;' . "\n";
-				$style .= '	padding-bottom: ' . $this->get_attr_value( ( isset( $attr['paddingBottom'] ) ? $attr['paddingBottom'] : null ), 20 ) . 'px;' . "\n";
-				$style .= '	padding-left: ' . $this->get_attr_value( ( isset( $attr['paddingLeft'] ) ? $attr['paddingLeft'] : null ), 20 ) . 'px;' . "\n";
-			}
+		$css->add_item(
+			array(
+				'selector'   => ' > .wp-block-themeisle-blocks-advanced-columns-overlay',
+				'properties' => array(
+					array(
+						'property'  => 'background',
+						'value'     => 'backgroundOverlayColor',
+						'condition' => function( $attrs ) {
+							return ! ( isset( $attrs['backgroundOverlayType'] ) && 'color' !== $attrs['backgroundOverlayType'] );
+						},
+					),
+					array(
+						'property' => 'opacity',
+						'value'    => 'backgroundOverlayOpacity',
+						'default'  => 50,
+						'format'   => function( $value, $attrs ) {
+							return $value / 100;
+						},
+					),
+					array(
+						'property'       => 'background',
+						'pattern'        => 'url( imageURL ) repeat attachment position/size',
+						'pattern_values' => array(
+							'imageURL'   => array(
+								'value' => 'backgroundOverlayImageURL',
+							),
+							'repeat'     => array(
+								'value'   => 'backgroundOverlayRepeat',
+								'default' => 'repeat',
+							),
+							'attachment' => array(
+								'value'   => 'backgroundOverlayAttachment',
+								'default' => 'scroll',
+							),
+							'position'   => array(
+								'value'   => 'backgroundOverlayPosition',
+								'default' => 'top left',
+							),
+							'size'       => array(
+								'value'   => 'backgroundOverlaySize',
+								'default' => 'auto',
+							),
+						),
+						'condition'      => function( $attrs ) {
+							return isset( $attrs['backgroundOverlayType'] ) && 'image' === $attrs['backgroundOverlayType'] && isset( $attrs['backgroundOverlayImageURL'] );
+						},
+					),
+					array(
+						'property'  => 'background',
+						'value'     => 'backgroundOverlayGradient',
+						'default'   => 'linear-gradient(90deg,rgba(54,209,220,1) 0%,rgba(91,134,229,1) 100%)',
+						'condition' => function( $attrs ) {
+							return isset( $attrs['backgroundOverlayType'] ) && 'gradient' === $attrs['backgroundOverlayType'] && isset( $attrs['backgroundOverlayGradient'] );
+						},
+					),
+					array(
+						'property'       => 'background',
+						'pattern'        => 'linear-gradient( angle, firstColor firstLocation, secondColor secondLocation )',
+						'pattern_values' => array(
+							'angle'          => array(
+								'value'   => 'backgroundOverlayGradientAngle',
+								'unit'    => 'deg',
+								'default' => 90,
+							),
+							'firstColor'     => array(
+								'value'   => 'backgroundOverlayGradientFirstColor',
+								'default' => '#36d1dc',
+							),
+							'firstLocation'  => array(
+								'value'   => 'backgroundOverlayGradientFirstLocation',
+								'unit'    => '%',
+								'default' => 0,
+							),
+							'secondColor'    => array(
+								'value'   => 'backgroundOverlayGradientSecondColor',
+								'default' => '#5b86e5',
+							),
+							'secondLocation' => array(
+								'value'   => 'backgroundOverlayGradientSecondLocation',
+								'unit'    => '%',
+								'default' => 100,
+							),
+						),
+						'condition'      => function( $attrs ) {
+							return isset( $attrs['backgroundOverlayType'] ) && 'gradient' === $attrs['backgroundOverlayType'] && ! isset( $attrs['backgroundOverlayGradient'] );
+						},
+					),
+					array(
+						'property'       => 'background',
+						'pattern'        => 'radial-gradient( at position, firstColor firstLocation, secondColor secondLocation )',
+						'pattern_values' => array(
+							'position'       => array(
+								'value'   => 'backgroundOverlayGradientPosition',
+								'default' => 'center center',
+							),
+							'firstColor'     => array(
+								'value'   => 'backgroundOverlayGradientFirstColor',
+								'default' => '#36d1dc',
+							),
+							'firstLocation'  => array(
+								'value'   => 'backgroundOverlayGradientFirstLocation',
+								'unit'    => '%',
+								'default' => 0,
+							),
+							'secondColor'    => array(
+								'value'   => 'backgroundOverlayGradientSecondColor',
+								'default' => '#5b86e5',
+							),
+							'secondLocation' => array(
+								'value'   => 'backgroundOverlayGradientSecondLocation',
+								'unit'    => '%',
+								'default' => 100,
+							),
+						),
+						'condition'      => function( $attrs ) {
+							return isset( $attrs['backgroundOverlayType'] ) && 'gradient' === $attrs['backgroundOverlayType'] && isset( $attrs['backgroundOverlayGradientType'] ) && 'radial' === $attrs['backgroundOverlayGradientType'];
+						},
+					),
+					array(
+						'property'       => 'filter',
+						'pattern'        => 'blur( filterBlur ) brightness( filterBrightness ) contrast( filterContrast ) grayscale( filterGrayscale ) hue-rotate( filterHue ) saturate( filterSaturate )',
+						'pattern_values' => array(
+							'filterBlur'       => array(
+								'value'   => 'backgroundOverlayFilterBlur',
+								'unit'    => 'px',
+								'default' => 0,
+								'format'  => function( $value, $attrs ) {
+									return $value / 10;
+								},
+							),
+							'filterBrightness' => array(
+								'value'   => 'backgroundOverlayFilterBrightness',
+								'default' => 10,
+								'format'  => function( $value, $attrs ) {
+									return $value / 10;
+								},
+							),
+							'filterContrast'   => array(
+								'value'   => 'backgroundOverlayFilterContrast',
+								'default' => 10,
+								'format'  => function( $value, $attrs ) {
+									return $value / 10;
+								},
+							),
+							'filterGrayscale'  => array(
+								'value'   => 'backgroundOverlayFilterGrayscale',
+								'default' => 0,
+								'format'  => function( $value, $attrs ) {
+									return $value / 100;
+								},
+							),
+							'filterHue'        => array(
+								'value'   => 'backgroundOverlayFilterHue',
+								'unit'    => 'deg',
+								'default' => 0,
+							),
+							'filterSaturate'   => array(
+								'value'   => 'backgroundOverlayFilterSaturate',
+								'default' => 10,
+								'format'  => function( $value, $attrs ) {
+									return $value / 10;
+								},
+							),
+						),
+						'condition'      => function( $attrs ) {
+							return isset( $attrs['backgroundOverlayFilterBlur'] );
+						},
+					),
+					array(
+						'property' => 'mix-blend-mode',
+						'value'    => 'backgroundOverlayBlend',
+						'default'  => 'normal',
+					),
+					array(
+						'property'  => 'border-radius',
+						'value'     => 'borderRadius',
+						'unit'      => 'px',
+						'default'   => 0,
+						'condition' => function( $attrs ) {
+							return ! ( isset( $attrs['borderRadiusType'] ) && 'unlinked' === $attrs['borderRadiusType'] );
+						},
+					),
+					array(
+						'property'       => 'border-radius',
+						'pattern'        => 'top-left top-right bottom-right bottom-left',
+						'pattern_values' => array(
+							'top-left'     => array(
+								'value'   => 'borderRadiusTop',
+								'unit'    => 'px',
+								'default' => 0,
+							),
+							'top-right'    => array(
+								'value'   => 'borderRadiusRight',
+								'unit'    => 'px',
+								'default' => 0,
+							),
+							'bottom-right' => array(
+								'value'   => 'borderRadiusBottom',
+								'unit'    => 'px',
+								'default' => 0,
+							),
+							'bottom-left'  => array(
+								'value'   => 'borderRadiusLeft',
+								'unit'    => 'px',
+								'default' => 0,
+							),
+						),
+						'condition'      => function( $attrs ) {
+							return isset( $attrs['borderRadiusType'] ) && 'unlinked' === $attrs['borderRadiusType'];
+						},
+					),
+				),
+			)
+		);
 
-			if ( 'linked' === $this->get_attr_value( ( isset( $attr['marginType'] ) ? $attr['marginType'] : null ), 'unlinked' ) ) {
-				$style .= '	margin-top: ' . $this->get_attr_value( ( isset( $attr['margin'] ) ? $attr['margin'] : null ), 20 ) . 'px;' . "\n";
-				$style .= '	margin-bottom: ' . $this->get_attr_value( ( isset( $attr['margin'] ) ? $attr['margin'] : null ), 20 ) . 'px;' . "\n";
-			}
+		$css->add_item(
+			array(
+				'selector'   => ' .wp-block-themeisle-blocks-advanced-columns-separators.top svg',
+				'properties' => array(
+					array(
+						'property' => 'height',
+						'value'    => 'dividerTopHeight',
+						'unit'     => 'px',
+					),
+					array(
+						'property'       => 'transform',
+						'pattern'        => 'scaleX( width )',
+						'pattern_values' => array(
+							'width' => array(
+								'value'  => 'dividerTopWidth',
+								'format' => function( $value, $attrs ) {
+									return $value / 100;
+								},
+							),
+						),
+						'condition'      => function( $attrs ) {
+							return isset( $attrs['dividerTopWidth'] );
+						},
+					),
+				),
+			)
+		);
 
-			if ( 'unlinked' === $this->get_attr_value( ( isset( $attr['marginType'] ) ? $attr['marginType'] : null ), 'unlinked' ) ) {
-				$style .= '	margin-top: ' . $this->get_attr_value( ( isset( $attr['marginTop'] ) ? $attr['marginTop'] : null ), 20 ) . 'px;' . "\n";
-				$style .= '	margin-bottom: ' . $this->get_attr_value( ( isset( $attr['marginBottom'] ) ? $attr['marginBottom'] : null ), 20 ) . 'px;' . "\n";
-			}
+		$css->add_item(
+			array(
+				'selector'   => ' .wp-block-themeisle-blocks-advanced-columns-separators.bottom svg',
+				'properties' => array(
+					array(
+						'property' => 'height',
+						'value'    => 'dividerBottomHeight',
+						'unit'     => 'px',
+					),
+					array(
+						'property'       => 'transform',
+						'pattern'        => 'scaleX( width )',
+						'pattern_values' => array(
+							'width' => array(
+								'value'  => 'dividerBottomWidth',
+								'format' => function( $value, $attrs ) {
+									return $value / 100;
+								},
+							),
+						),
+						'condition'      => function( $attrs ) {
+							return isset( $attrs['dividerBottomWidth'] );
+						},
+					),
+				),
+			)
+		);
 
-			if ( 'custom' !== $this->get_attr_value( ( isset( $attr['columnsHeight'] ) ? $attr['columnsHeight'] : null ), 'auto' ) ) {
-				$style .= '	min-height: ' . $this->get_attr_value( ( isset( $attr['columnsHeight'] ) ? $attr['columnsHeight'] : null ), 'auto' ) . ';' . "\n";
-			}
+		$css->add_item(
+			array(
+				'selector'   => ' .innerblocks-wrap',
+				'properties' => array(
+					array(
+						'property' => 'max-width',
+						'value'    => 'columnsWidth',
+						'unit'     => 'px',
+					),
+				),
+			)
+		);
 
-			if ( ( 'custom' === $this->get_attr_value( ( isset( $attr['columnsHeight'] ) ? $attr['columnsHeight'] : null ), 'auto' ) ) && isset( $attr['columnsHeightCustom'] ) ) {
-				$style .= '	min-height: ' . $this->get_attr_value( ( isset( $attr['columnsHeightCustom'] ) ? $attr['columnsHeightCustom'] : null ) ) . 'px;' . "\n";
-			}
-			$style .= '}' . "\n \n";
+		$css->add_item(
+			array(
+				'query'      => '@media ( min-width: 600px ) and ( max-width: 960px )',
+				'properties' => array(
+					array(
+						'property'  => 'padding',
+						'value'     => 'paddingTablet',
+						'unit'      => 'px',
+						'condition' => function( $attrs ) {
+							return ! ( isset( $attrs['paddingTypeTablet'] ) && 'unlinked' === $attrs['paddingTypeTablet'] );
+						},
+					),
+					array(
+						'property'  => 'padding-top',
+						'value'     => 'paddingTopTablet',
+						'unit'      => 'px',
+						'condition' => function( $attrs ) {
+							return isset( $attrs['paddingTypeTablet'] ) && 'unlinked' === $attrs['paddingTypeTablet'];
+						},
+					),
+					array(
+						'property'  => 'padding-right',
+						'value'     => 'paddingRightTablet',
+						'unit'      => 'px',
+						'condition' => function( $attrs ) {
+							return isset( $attrs['paddingTypeTablet'] ) && 'unlinked' === $attrs['paddingTypeTablet'];
+						},
+					),
+					array(
+						'property'  => 'padding-bottom',
+						'value'     => 'paddingBottomTablet',
+						'unit'      => 'px',
+						'condition' => function( $attrs ) {
+							return isset( $attrs['paddingTypeTablet'] ) && 'unlinked' === $attrs['paddingTypeTablet'];
+						},
+					),
+					array(
+						'property'  => 'padding-left',
+						'value'     => 'paddingLeftTablet',
+						'unit'      => 'px',
+						'condition' => function( $attrs ) {
+							return isset( $attrs['paddingTypeTablet'] ) && 'unlinked' === $attrs['paddingTypeTablet'];
+						},
+					),
+					array(
+						'property'  => 'margin-top',
+						'value'     => 'marginTablet',
+						'unit'      => 'px',
+						'condition' => function( $attrs ) {
+							return isset( $attrs['marginTypeTablet'] ) && 'linked' === $attrs['marginTypeTablet'];
+						},
+					),
+					array(
+						'property'  => 'margin-bottom',
+						'value'     => 'marginTablet',
+						'unit'      => 'px',
+						'condition' => function( $attrs ) {
+							return isset( $attrs['marginTypeTablet'] ) && 'linked' === $attrs['marginTypeTablet'];
+						},
+					),
+					array(
+						'property'  => 'margin-top',
+						'value'     => 'marginTopTablet',
+						'unit'      => 'px',
+						'condition' => function( $attrs ) {
+							return ! ( isset( $attrs['marginTypeTablet'] ) && 'linked' === $attrs['marginTypeTablet'] );
+						},
+					),
+					array(
+						'property'  => 'margin-bottom',
+						'value'     => 'marginBottomTablet',
+						'unit'      => 'px',
+						'condition' => function( $attrs ) {
+							return ! ( isset( $attrs['marginTypeTablet'] ) && 'linked' === $attrs['marginTypeTablet'] );
+						},
+					),
+					array(
+						'property'  => 'min-height',
+						'value'     => 'columnsHeightCustomTablet',
+						'unit'      => 'px',
+						'condition' => function( $attrs ) {
+							return isset( $attrs['columnsHeight'] ) && 'custom' === $attrs['columnsHeight'];
+						},
+					),
+				),
+			)
+		);
 
-			if ( isset( $attr['dividerTopWidth'] ) ) {
-				$style     .= '#' . $attr['id'] . ' .wp-block-themeisle-blocks-advanced-columns-separators.top {' . "\n";
-					$style .= '	transform: scaleX( ' . $this->get_attr_value( ( isset( $attr['dividerTopWidth'] ) ? $attr['dividerTopWidth'] : null ) ) / 100 . ' );' . "\n";
-				$style     .= '}' . "\n \n";
-			}
+		$css->add_item(
+			array(
+				'query'      => '@media ( min-width: 600px ) and ( max-width: 960px )',
+				'selector'   => ' .wp-block-themeisle-blocks-advanced-columns-separators.top svg',
+				'properties' => array(
+					array(
+						'property' => 'height',
+						'value'    => 'dividerTopHeightTablet',
+						'unit'     => 'px',
+					),
+					array(
+						'property'       => 'transform',
+						'pattern'        => 'scaleX( width )',
+						'pattern_values' => array(
+							'width' => array(
+								'value'  => 'dividerTopWidthTablet',
+								'format' => function( $value, $attrs ) {
+									return $value / 100;
+								},
+							),
+						),
+						'condition'      => function( $attrs ) {
+							return isset( $attrs['dividerTopWidthTablet'] );
+						},
+					),
+				),
+			)
+		);
 
-			if ( isset( $attr['dividerTopHeight'] ) ) {
-				$style     .= '#' . $attr['id'] . ' .wp-block-themeisle-blocks-advanced-columns-separators.top svg {' . "\n";
-					$style .= '	height: ' . $this->get_attr_value( ( isset( $attr['dividerTopHeight'] ) ? $attr['dividerTopHeight'] : null ) ) . 'px;' . "\n";
-				$style     .= '}' . "\n \n";
-			}
+		$css->add_item(
+			array(
+				'query'      => '@media ( min-width: 600px ) and ( max-width: 960px )',
+				'selector'   => ' .wp-block-themeisle-blocks-advanced-columns-separators.bottom svg',
+				'properties' => array(
+					array(
+						'property' => 'height',
+						'value'    => 'dividerBottomHeightTablet',
+						'unit'     => 'px',
+					),
+					array(
+						'property'       => 'transform',
+						'pattern'        => 'scaleX( width )',
+						'pattern_values' => array(
+							'width' => array(
+								'value'  => 'dividerBottomWidthTablet',
+								'format' => function( $value, $attrs ) {
+									return $value / 100;
+								},
+							),
+						),
+						'condition'      => function( $attrs ) {
+							return isset( $attrs['dividerBottomWidthTablet'] );
+						},
+					),
+				),
+			)
+		);
 
-			if ( isset( $attr['dividerBottomWidth'] ) ) {
-				$style     .= '#' . $attr['id'] . ' .wp-block-themeisle-blocks-advanced-columns-separators.bottom {' . "\n";
-					$style .= '	transform: scaleX( ' . $this->get_attr_value( ( isset( $attr['dividerBottomWidth'] ) ? $attr['dividerBottomWidth'] : null ) ) / 100 . ' );' . "\n";
-				$style     .= '}' . "\n \n";
-			}
+		$css->add_item(
+			array(
+				'query'      => '@media ( max-width: 600px )',
+				'properties' => array(
+					array(
+						'property'  => 'padding',
+						'value'     => 'paddingMobile',
+						'unit'      => 'px',
+						'condition' => function( $attrs ) {
+							return ! ( isset( $attrs['paddingTypeMobile'] ) && 'unlinked' === $attrs['paddingTypeMobile'] );
+						},
+					),
+					array(
+						'property'  => 'padding-top',
+						'value'     => 'paddingTopMobile',
+						'unit'      => 'px',
+						'condition' => function( $attrs ) {
+							return isset( $attrs['paddingTypeMobile'] ) && 'unlinked' === $attrs['paddingTypeMobile'];
+						},
+					),
+					array(
+						'property'  => 'padding-right',
+						'value'     => 'paddingRightMobile',
+						'unit'      => 'px',
+						'condition' => function( $attrs ) {
+							return isset( $attrs['paddingTypeMobile'] ) && 'unlinked' === $attrs['paddingTypeMobile'];
+						},
+					),
+					array(
+						'property'  => 'padding-bottom',
+						'value'     => 'paddingBottomMobile',
+						'unit'      => 'px',
+						'condition' => function( $attrs ) {
+							return isset( $attrs['paddingTypeMobile'] ) && 'unlinked' === $attrs['paddingTypeMobile'];
+						},
+					),
+					array(
+						'property'  => 'padding-left',
+						'value'     => 'paddingLeftMobile',
+						'unit'      => 'px',
+						'condition' => function( $attrs ) {
+							return isset( $attrs['paddingTypeMobile'] ) && 'unlinked' === $attrs['paddingTypeMobile'];
+						},
+					),
+					array(
+						'property'  => 'margin-top',
+						'value'     => 'marginMobile',
+						'unit'      => 'px',
+						'condition' => function( $attrs ) {
+							return isset( $attrs['marginTypeMobile'] ) && 'linked' === $attrs['marginTypeMobile'];
+						},
+					),
+					array(
+						'property'  => 'margin-bottom',
+						'value'     => 'marginMobile',
+						'unit'      => 'px',
+						'condition' => function( $attrs ) {
+							return isset( $attrs['marginTypeMobile'] ) && 'linked' === $attrs['marginTypeMobile'];
+						},
+					),
+					array(
+						'property'  => 'margin-top',
+						'value'     => 'marginTopMobile',
+						'unit'      => 'px',
+						'condition' => function( $attrs ) {
+							return ! ( isset( $attrs['marginTypeMobile'] ) && 'linked' === $attrs['marginTypeMobile'] );
+						},
+					),
+					array(
+						'property'  => 'margin-bottom',
+						'value'     => 'marginBottomMobile',
+						'unit'      => 'px',
+						'condition' => function( $attrs ) {
+							return ! ( isset( $attrs['marginTypeMobile'] ) && 'linked' === $attrs['marginTypeMobile'] );
+						},
+					),
+					array(
+						'property'  => 'min-height',
+						'value'     => 'columnsHeightCustomMobile',
+						'unit'      => 'px',
+						'condition' => function( $attrs ) {
+							return isset( $attrs['columnsHeight'] ) && 'custom' === $attrs['columnsHeight'];
+						},
+					),
+				),
+			)
+		);
 
-			if ( isset( $attr['dividerBottomHeight'] ) ) {
-				$style     .= '#' . $attr['id'] . ' .wp-block-themeisle-blocks-advanced-columns-separators.bottom svg {' . "\n";
-					$style .= '	height: ' . $this->get_attr_value( ( isset( $attr['dividerBottomHeight'] ) ? $attr['dividerBottomHeight'] : null ) ) . 'px;' . "\n";
-				$style     .= '}' . "\n \n";
-			}
+		$css->add_item(
+			array(
+				'query'      => '@media ( max-width: 600px )',
+				'selector'   => ' .wp-block-themeisle-blocks-advanced-columns-separators.top svg',
+				'properties' => array(
+					array(
+						'property' => 'height',
+						'value'    => 'dividerTopHeightMobile',
+						'unit'     => 'px',
+					),
+					array(
+						'property'       => 'transform',
+						'pattern'        => 'scaleX( width )',
+						'pattern_values' => array(
+							'width' => array(
+								'value'  => 'dividerTopWidthMobile',
+								'format' => function( $value, $attrs ) {
+									return $value / 100;
+								},
+							),
+						),
+						'condition'      => function( $attrs ) {
+							return isset( $attrs['dividerTopWidthMobile'] );
+						},
+					),
+				),
+			)
+		);
 
-			$style     .= '#' . $attr['id'] . ' .wp-themeisle-block-overlay {' . "\n";
-				$style .= '	filter: blur( ' . $this->get_attr_value( ( isset( $attr['backgroundOverlayFilterBlur'] ) ? ( $attr['backgroundOverlayFilterBlur'] / 10 ) : 0 ) ) . 'px ) brightness( ' . $this->get_attr_value( ( isset( $attr['backgroundOverlayFilterBrightness'] ) ? ( $attr['backgroundOverlayFilterBrightness'] / 10 ) : 1 ) ) . ' ) contrast( ' . $this->get_attr_value( ( isset( $attr['backgroundOverlayFilterContrast'] ) ? ( $attr['backgroundOverlayFilterContrast'] / 10 ) : 1 ) ) . ' ) grayscale( ' . $this->get_attr_value( ( isset( $attr['backgroundOverlayFilterGrayscale'] ) ? ( $attr['backgroundOverlayFilterGrayscale'] / 100 ) : 0 ) ) . ' ) hue-rotate( ' . $this->get_attr_value( ( isset( $attr['backgroundOverlayFilterHue'] ) ? $attr['backgroundOverlayFilterHue'] : 0 ) ) . 'deg ) saturate( ' . $this->get_attr_value( ( isset( $attr['backgroundOverlayFilterSaturate'] ) ? ( $attr['backgroundOverlayFilterSaturate'] / 10 ) : 1 ) ) . ' )' . "\n";
-			$style     .= '}' . "\n \n";
+		$css->add_item(
+			array(
+				'query'      => '@media ( max-width: 600px )',
+				'selector'   => ' .wp-block-themeisle-blocks-advanced-columns-separators.bottom svg',
+				'properties' => array(
+					array(
+						'property' => 'height',
+						'value'    => 'dividerBottomHeightMobile',
+						'unit'     => 'px',
+					),
+					array(
+						'property'       => 'transform',
+						'pattern'        => 'scaleX( width )',
+						'pattern_values' => array(
+							'width' => array(
+								'value'  => 'dividerBottomWidthMobile',
+								'format' => function( $value, $attrs ) {
+									return $value / 100;
+								},
+							),
+						),
+						'condition'      => function( $attrs ) {
+							return isset( $attrs['dividerBottomWidthMobile'] );
+						},
+					),
+				),
+			)
+		);
 
-			$style .= '@media ( min-width: 600px ) and ( max-width: 960px )  {' . "\n";
-
-				$style .= '	#' . $attr['id'] . ' {' . "\n";
-			if ( 'linked' === $this->get_attr_value( ( isset( $attr['paddingTypeTablet'] ) ? $attr['paddingTypeTablet'] : null ), 'linked' ) ) {
-				$style .= '		padding: ' . $this->get_attr_value( ( isset( $attr['paddingTablet'] ) ? $attr['paddingTablet'] : null ), 20 ) . 'px;' . "\n";
-			}
-	
-			if ( 'unlinked' === $this->get_attr_value( ( isset( $attr['paddingTypeTablet'] ) ? $attr['paddingTypeTablet'] : null ), 'linked' ) ) {
-				$style .= '		padding-top: ' . $this->get_attr_value( ( isset( $attr['paddingTopTablet'] ) ? $attr['paddingTopTablet'] : null ), 20 ) . 'px;' . "\n";
-				$style .= '		padding-right: ' . $this->get_attr_value( ( isset( $attr['paddingRightTablet'] ) ? $attr['paddingRightTablet'] : null ), 20 ) . 'px;' . "\n";
-				$style .= '		padding-bottom: ' . $this->get_attr_value( ( isset( $attr['paddingBottomTablet'] ) ? $attr['paddingBottomTablet'] : null ), 20 ) . 'px;' . "\n";
-				$style .= '		padding-left: ' . $this->get_attr_value( ( isset( $attr['paddingLeftTablet'] ) ? $attr['paddingLeftTablet'] : null ), 20 ) . 'px;' . "\n";
-			}
-
-			if ( 'linked' === $this->get_attr_value( ( isset( $attr['marginTypeTablet'] ) ? $attr['marginTypeTablet'] : null ), 'unlinked' ) ) {
-				$style .= '		margin-top: ' . $this->get_attr_value( ( isset( $attr['marginTablet'] ) ? $attr['marginTablet'] : null ), 20 ) . 'px;' . "\n";
-				$style .= '		margin-bottom: ' . $this->get_attr_value( ( isset( $attr['marginTablet'] ) ? $attr['marginTablet'] : null ), 20 ) . 'px;' . "\n";
-			}
-	
-			if ( 'unlinked' === $this->get_attr_value( ( isset( $attr['marginTypeTablet'] ) ? $attr['marginTypeTablet'] : null ), 'unlinked' ) ) {
-				$style .= '		margin-top: ' . $this->get_attr_value( ( isset( $attr['marginTopTablet'] ) ? $attr['marginTopTablet'] : null ), 20 ) . 'px;' . "\n";
-				$style .= '		margin-bottom: ' . $this->get_attr_value( ( isset( $attr['marginBottomTablet'] ) ? $attr['marginBottomTablet'] : null ), 20 ) . 'px;' . "\n";
-			}
-
-			if ( ( 'custom' === $this->get_attr_value( ( isset( $attr['columnsHeight'] ) ? $attr['columnsHeight'] : null ), 'auto' ) ) && isset( $attr['columnsHeightCustomTablet'] ) ) {
-				$style .= '		min-height: ' . $this->get_attr_value( ( isset( $attr['columnsHeightCustomTablet'] ) ? $attr['columnsHeightCustomTablet'] : null ) ) . 'px;' . "\n";
-			}
-				$style .= '	}' . "\n \n";
-
-			if ( isset( $attr['dividerTopWidthTablet'] ) ) {
-				$style     .= '	#' . $attr['id'] . ' .wp-block-themeisle-blocks-advanced-columns-separators.top {' . "\n";
-					$style .= '		transform: scaleX( ' . $this->get_attr_value( ( isset( $attr['dividerTopWidthTablet'] ) ? $attr['dividerTopWidthTablet'] : null ) ) / 100 . ' );' . "\n";
-				$style     .= '	}' . "\n \n";
-			}
-	
-			if ( isset( $attr['dividerTopHeightTablet'] ) ) {
-				$style     .= '	#' . $attr['id'] . ' .wp-block-themeisle-blocks-advanced-columns-separators.top svg {' . "\n";
-					$style .= '		height: ' . $this->get_attr_value( ( isset( $attr['dividerTopHeightTablet'] ) ? $attr['dividerTopHeightTablet'] : null ) ) . 'px;' . "\n";
-				$style     .= '	}' . "\n \n";
-			}
-	
-			if ( isset( $attr['dividerBottomWidthTablet'] ) ) {
-				$style     .= '	#' . $attr['id'] . ' .wp-block-themeisle-blocks-advanced-columns-separators.bottom {' . "\n";
-					$style .= '		transform: scaleX( ' . $this->get_attr_value( ( isset( $attr['dividerBottomWidthTablet'] ) ? $attr['dividerBottomWidthTablet'] : null ) ) / 100 . ' );' . "\n";
-				$style     .= '	}' . "\n \n";
-			}
-	
-			if ( isset( $attr['dividerBottomHeightTablet'] ) ) {
-				$style     .= '	#' . $attr['id'] . ' .wp-block-themeisle-blocks-advanced-columns-separators.bottom svg {' . "\n";
-					$style .= '		height: ' . $this->get_attr_value( ( isset( $attr['dividerBottomHeightTablet'] ) ? $attr['dividerBottomHeightTablet'] : null ) ) . 'px;' . "\n";
-				$style     .= '	}' . "\n \n";
-			}
-
-			$style .= '}' . "\n \n";
-
-			$style .= '@media ( max-width: 600px )  {' . "\n";
-
-				$style .= '	#' . $attr['id'] . ' {' . "\n";
-			if ( 'linked' === $this->get_attr_value( ( isset( $attr['paddingTypeMobile'] ) ? $attr['paddingTypeMobile'] : null ), 'linked' ) ) {
-				$style .= '		padding: ' . $this->get_attr_value( ( isset( $attr['paddingMobile'] ) ? $attr['paddingMobile'] : null ), 20 ) . 'px;' . "\n";
-			}
-	
-			if ( 'unlinked' === $this->get_attr_value( ( isset( $attr['paddingTypeMobile'] ) ? $attr['paddingTypeMobile'] : null ), 'linked' ) ) {
-				$style .= '		padding-top: ' . $this->get_attr_value( ( isset( $attr['paddingTopMobile'] ) ? $attr['paddingTopMobile'] : null ), 20 ) . 'px;' . "\n";
-				$style .= '		padding-right: ' . $this->get_attr_value( ( isset( $attr['paddingRightMobile'] ) ? $attr['paddingRightMobile'] : null ), 20 ) . 'px;' . "\n";
-				$style .= '		padding-bottom: ' . $this->get_attr_value( ( isset( $attr['paddingBottomMobile'] ) ? $attr['paddingBottomMobile'] : null ), 20 ) . 'px;' . "\n";
-				$style .= '		padding-left: ' . $this->get_attr_value( ( isset( $attr['paddingLeftMobile'] ) ? $attr['paddingLeftMobile'] : null ), 20 ) . 'px;' . "\n";
-			}
-
-			if ( 'linked' === $this->get_attr_value( ( isset( $attr['marginTypeMobile'] ) ? $attr['marginTypeMobile'] : null ), 'unlinked' ) ) {
-				$style .= '		margin-top: ' . $this->get_attr_value( ( isset( $attr['marginMobile'] ) ? $attr['marginMobile'] : null ), 20 ) . 'px;' . "\n";
-				$style .= '		margin-bottom: ' . $this->get_attr_value( ( isset( $attr['marginMobile'] ) ? $attr['marginMobile'] : null ), 20 ) . 'px;' . "\n";
-			}
-	
-			if ( 'unlinked' === $this->get_attr_value( ( isset( $attr['marginTypeMobile'] ) ? $attr['marginTypeMobile'] : null ), 'unlinked' ) ) {
-				$style .= '		margin-top: ' . $this->get_attr_value( ( isset( $attr['marginTopMobile'] ) ? $attr['marginTopMobile'] : null ), 20 ) . 'px;' . "\n";
-				$style .= '		margin-bottom: ' . $this->get_attr_value( ( isset( $attr['marginBottomMobile'] ) ? $attr['marginBottomMobile'] : null ), 20 ) . 'px;' . "\n";
-			}
-
-			if ( ( 'custom' === $this->get_attr_value( ( isset( $attr['columnsHeight'] ) ? $attr['columnsHeight'] : null ), 'auto' ) ) && isset( $attr['columnsHeightCustomMobile'] ) ) {
-				$style .= '		min-height: ' . $this->get_attr_value( ( isset( $attr['columnsHeightCustomMobile'] ) ? $attr['columnsHeightCustomMobile'] : null ) ) . 'px;' . "\n";
-			}
-				$style .= '	}' . "\n \n";
-
-			if ( isset( $attr['dividerTopWidthMobile'] ) ) {
-				$style     .= '	#' . $attr['id'] . ' .wp-block-themeisle-blocks-advanced-columns-separators.top {' . "\n";
-					$style .= '		transform: scaleX( ' . $this->get_attr_value( ( isset( $attr['dividerTopWidthMobile'] ) ? $attr['dividerTopWidthMobile'] : null ) ) / 100 . ' );' . "\n";
-				$style     .= '	}' . "\n \n";
-			}
-	
-			if ( isset( $attr['dividerTopHeightMobile'] ) ) {
-				$style     .= '	#' . $attr['id'] . ' .wp-block-themeisle-blocks-advanced-columns-separators.top svg {' . "\n";
-					$style .= '		height: ' . $this->get_attr_value( ( isset( $attr['dividerTopHeightMobile'] ) ? $attr['dividerTopHeightMobile'] : null ) ) . 'px;' . "\n";
-				$style     .= '	}' . "\n \n";
-			}
-	
-			if ( isset( $attr['dividerBottomWidthMobile'] ) ) {
-				$style     .= '	#' . $attr['id'] . ' .wp-block-themeisle-blocks-advanced-columns-separators.bottom {' . "\n";
-					$style .= '		transform: scaleX( ' . $this->get_attr_value( ( isset( $attr['dividerBottomWidthMobile'] ) ? $attr['dividerBottomWidthMobile'] : null ) ) / 100 . ' );' . "\n";
-				$style     .= '	}' . "\n \n";
-			}
-	
-			if ( isset( $attr['dividerBottomHeightMobile'] ) ) {
-				$style     .= '	#' . $attr['id'] . ' .wp-block-themeisle-blocks-advanced-columns-separators.bottom svg {' . "\n";
-					$style .= '		height: ' . $this->get_attr_value( ( isset( $attr['dividerBottomHeightMobile'] ) ? $attr['dividerBottomHeightMobile'] : null ) ) . 'px;' . "\n";
-				$style     .= '	}' . "\n \n";
-			}
-
-			$style .= '}' . "\n \n";
-		}
+		$style = $css->generate();
 
 		return $style;
 	}

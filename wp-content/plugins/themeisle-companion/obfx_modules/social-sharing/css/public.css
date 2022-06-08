@@ -89,6 +89,14 @@
 	display: inline;
 }
 
+.obfx-sharing-inline a.btn{
+    width: 44px;
+    height: 44px;
+    line-height: 44px;
+    border-radius: 50%;
+    padding: 0;
+}
+
 /* Social icons color */
 .obfx-sharing-inline a.btn-facebook,
 .obfx-sharing a.facebook {
@@ -98,11 +106,6 @@
 .obfx-sharing-inline a.btn-twitter,
 .obfx-sharing a.twitter {
 	background-color: #1da1f2;
-}
-
-.obfx-sharing-inline a.btn-googleplus,
-.obfx-sharing a.googleplus {
-	background-color: #dd4b39;
 }
 
 .obfx-sharing-inline a.btn-pinterest,
@@ -173,6 +176,11 @@
 .obfx-sharing-inline a.btn-mail,
 .obfx-sharing a.mail {
 	background-color: #58a9de;
+}
+
+.obfx-sharing-inline a.btn-telegram,
+.obfx-sharing a.telegram {
+	background-color: #36aff3;
 }
 
 @media ( max-width: 768px ) {

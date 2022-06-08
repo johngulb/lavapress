@@ -63,7 +63,6 @@ class Orbit_Fox_Global_Settings {
 				array(
 					'social-sharing',
 					'gutenberg-blocks',
-					'uptime-monitor',
 					'google-analytics',
 					'companion-legacy',
 					'elementor-widgets',
@@ -72,6 +71,8 @@ class Orbit_Fox_Global_Settings {
 					'mystock-import',
 					'policy-notice',
 					'beaver-widgets',
+					'header-footer-scripts',
+					'custom-fonts',
 				)
 			);
 		}// End if().

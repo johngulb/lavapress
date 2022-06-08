@@ -14,7 +14,6 @@ use ThemeIsle\GutenbergBlocks\Base_Block;
  */
 class Google_Map_Block extends Base_Block {
 
-
 	/**
 	 * Every block needs a slug, so we need to define one and assign it to the `$this->block_slug` property
 	 *
@@ -97,7 +96,18 @@ class Google_Map_Block extends Base_Block {
 	 */
 	protected function render( $attributes ) {
 		if ( function_exists( 'is_amp_endpoint' ) && is_amp_endpoint() ) {
-			return;
+			$apikey = get_option( 'themeisle_google_map_block_api_key' );
+
+			// Don't output anything if there is no API key.
+			if ( null === $apikey || empty( $apikey ) ) {
+				return;
+			}
+
+			$output  = '<amp-iframe width="400" height="' . intval( $attributes['height'] ) . '" sandbox="allow-scripts allow-same-origin" layout="responsive" src="https://www.google.com/maps/embed/v1/place?key=' . esc_attr( $apikey ) . '&q=' . esc_attr( $attributes['latitude'] ) . ', ' . esc_attr( $attributes['longitude'] ) . '">';
+			$output .= '	<amp-img layout="fill" src="' . plugin_dir_url( __FILE__ ) . '../../assets/icons/map-standard.png" placeholder></amp-img>';
+			$output .= '</amp-iframe>';
+
+			return $output;
 		}
 
 		$id    = isset( $attributes['id'] ) ? $attributes['id'] : 'wp-block-themeisle-blocks-google-map-' . wp_rand( 10, 100 );
@@ -111,7 +121,7 @@ class Google_Map_Block extends Base_Block {
 			$class .= ' align' . esc_attr( $attributes['align'] );
 		}
 
-		$output  = '<div class="' . esc_attr( $class ) . '" id="' . esc_attr( $id ) . '" style="height:' . intval( $attributes['height'] ) . 'px;"></div>' . "\n";
+		$output  = '<div class="' . esc_attr( $class ) . '" id="' . esc_attr( $id ) . '"></div>' . "\n";
 		$output .= '<script type="text/javascript">' . "\n";
 		$output .= '	/* <![CDATA[ */' . "\n";
 		$output .= '		if ( ! window.themeisleGoogleMaps ) window.themeisleGoogleMaps =[];' . "\n";

@@ -59,9 +59,10 @@ class WPForms_Field_Number extends WPForms_Field {
 		 */
 
 		// Options open markup.
-		$args = array(
+		$args = [
 			'markup' => 'open',
-		);
+		];
+
 		$this->field_option( 'advanced-options', $field, $args );
 
 		// Size.
@@ -70,19 +71,20 @@ class WPForms_Field_Number extends WPForms_Field {
 		// Placeholder.
 		$this->field_option( 'placeholder', $field );
 
-		// Hide label.
-		$this->field_option( 'label_hide', $field );
-
 		// Default value.
 		$this->field_option( 'default_value', $field );
 
 		// Custom CSS classes.
 		$this->field_option( 'css', $field );
 
+		// Hide label.
+		$this->field_option( 'label_hide', $field );
+
 		// Options close markup.
-		$args = array(
+		$args = [
 			'markup' => 'close',
-		);
+		];
+
 		$this->field_option( 'advanced-options', $field, $args );
 	}
 
@@ -102,7 +104,7 @@ class WPForms_Field_Number extends WPForms_Field {
 		$this->field_preview_option( 'label', $field );
 
 		// Primary input.
-		echo '<input type="text" placeholder="' . esc_attr( $placeholder ) . '" class="primary-input" disabled>';
+		echo '<input type="text" placeholder="' . esc_attr( $placeholder ) . '" class="primary-input" readonly>';
 
 		// Description.
 		$this->field_preview_option( 'description', $field );
@@ -149,7 +151,7 @@ class WPForms_Field_Number extends WPForms_Field {
 		if (
 			! empty( $form_data['fields'][ $field_id ]['required'] ) &&
 			empty( $value ) &&
-			'0' != $value
+			! is_numeric( $value )
 		) {
 			wpforms()->process->errors[ $form_id ][ $field_id ] = wpforms_get_required_label();
 		}
@@ -194,14 +196,17 @@ class WPForms_Field_Number extends WPForms_Field {
 	 */
 	private function sanitize_value( $value ) {
 
+		if ( empty( $value ) && ! is_numeric( $value ) ) {
+			return '';
+		}
+
 		// Some browsers allow other non-digit/decimal characters to be submitted
 		// with the num input, which then trips the is_numeric validation below.
 		// To get around this we remove all chars that are not expected.
 		$signed_value = preg_replace( '/[^-0-9.]/', '', $value );
-		$abs_value    = abs( $signed_value );
-		$value        = strpos( $signed_value, '-' ) === 0 ? '-' . $abs_value : $abs_value;
+		$abs_value    = str_replace( '-', '', $signed_value );
 
-		return $value;
+		return $signed_value < 0 ? '-' . $abs_value : $abs_value;
 	}
 }
 

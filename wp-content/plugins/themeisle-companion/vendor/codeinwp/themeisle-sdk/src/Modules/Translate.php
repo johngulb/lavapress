@@ -295,7 +295,7 @@ class Translate extends Abstract_Module {
 		),
 		'gn'             => array(
 			'slug' => 'gn',
-			'name' => 'Guaraní',
+			'name' => 'Guarani',
 		),
 		'gsw'            => array(
 			'slug' => 'gsw',
@@ -471,7 +471,7 @@ class Translate extends Abstract_Module {
 		),
 		'nb_NO'          => array(
 			'slug' => 'nb',
-			'name' => 'Norwegian (Bokmål)',
+			'name' => 'Norwegian (Bokmal)',
 		),
 		'nl_NL'          => array(
 			'slug' => 'nl',
@@ -805,7 +805,7 @@ class Translate extends Abstract_Module {
 		$translations = get_transient( $cache_key );
 
 		if ( false === $translations ) {
-			require_once( ABSPATH . 'wp-admin/includes/translation-install.php' );
+			require_once ABSPATH . 'wp-admin/includes/translation-install.php';
 			$translations = translations_api(
 				$product->get_type() . 's',
 				array(

@@ -15,14 +15,6 @@ use ThemeIsle\GutenbergBlocks\Base_Block;
 class Sharing_Icons_Block extends Base_Block {
 
 	/**
-	 * Social media attributes.
-	 *
-	 * @var array
-	 */
-	protected $social_attributes = array();
-
-
-	/**
 	 * Every block needs a slug, so we need to define one and assign it to the `$this->block_slug` property
 	 *
 	 * @return mixed
@@ -37,44 +29,6 @@ class Sharing_Icons_Block extends Base_Block {
 	 * @return mixed
 	 */
 	protected function set_attributes() {
-		$this->social_attributes = array(
-			'facebook'  => array(
-				'label' => esc_html__( 'Facebook', 'textdomain' ),
-				'icon'  => 'facebook-f',
-				'url'   => 'https://www.facebook.com/sharer/sharer.php?u=' . esc_url( get_the_permalink() ) . '&title=' . esc_attr( get_the_title() ),
-			),
-
-			'twitter'   => array(
-				'label' => esc_html__( 'Twitter', 'textdomain' ),
-				'icon'  => 'twitter',
-				'url'   => 'http://twitter.com/share?url=' . esc_url( get_the_permalink() ) . '&text=' . esc_attr( get_the_title() ),
-			),
-
-			'linkedin'  => array(
-				'label' => esc_html__( 'Linkedin', 'textdomain' ),
-				'icon'  => 'linkedin-in',
-				'url'   => 'https://www.linkedin.com/shareArticle?mini=true&url=' . esc_url( get_the_permalink() ) . '&title=' . esc_attr( get_the_title() ),
-			),
-
-			'pinterest' => array(
-				'label' => esc_html__( 'Pinterest', 'textdomain' ),
-				'icon'  => 'pinterest-p',
-				'url'   => 'https://pinterest.com/pin/create/button/?url=' . esc_url( get_the_permalink() ) . '&description=' . esc_attr( get_the_title() ),
-			),
-
-			'tumblr'    => array(
-				'label' => esc_html__( 'Tumblr', 'textdomain' ),
-				'icon'  => 'tumblr',
-				'url'   => 'https://tumblr.com/share/link?url=' . esc_url( get_the_permalink() ) . '&name=' . esc_attr( get_the_title() ),
-			),
-
-			'reddit'    => array(
-				'label' => esc_html__( 'Reddit', 'textdomain' ),
-				'icon'  => 'reddit-alien',
-				'url'   => 'https://www.reddit.com/submit?url=' . esc_url( get_the_permalink() ),
-			),
-		);
-
 		$this->attributes = array(
 			'align'     => array(
 				'type' => 'string',
@@ -111,6 +65,53 @@ class Sharing_Icons_Block extends Base_Block {
 	}
 
 	/**
+	 * Return attributes for social media services.
+	 *
+	 * @return array
+	 */
+	protected function get_social_profiles() {
+		$social_attributes = array(
+			'facebook'  => array(
+				'label' => esc_html__( 'Facebook', 'otter-blocks', 'themeisle-companion' ),
+				'icon'  => 'facebook-f',
+				'url'   => 'https://www.facebook.com/sharer/sharer.php?u=' . esc_url( get_the_permalink() ) . '&title=' . esc_attr( get_the_title() ),
+			),
+
+			'twitter'   => array(
+				'label' => esc_html__( 'Twitter', 'otter-blocks', 'themeisle-companion' ),
+				'icon'  => 'twitter',
+				'url'   => 'http://twitter.com/share?url=' . esc_url( get_the_permalink() ) . '&text=' . esc_attr( get_the_title() ),
+			),
+
+			'linkedin'  => array(
+				'label' => esc_html__( 'Linkedin', 'otter-blocks', 'themeisle-companion' ),
+				'icon'  => 'linkedin-in',
+				'url'   => 'https://www.linkedin.com/shareArticle?mini=true&url=' . esc_url( get_the_permalink() ) . '&title=' . esc_attr( get_the_title() ),
+			),
+
+			'pinterest' => array(
+				'label' => esc_html__( 'Pinterest', 'otter-blocks', 'themeisle-companion' ),
+				'icon'  => 'pinterest-p',
+				'url'   => 'https://pinterest.com/pin/create/button/?url=' . esc_url( get_the_permalink() ) . '&description=' . esc_attr( get_the_title() ),
+			),
+
+			'tumblr'    => array(
+				'label' => esc_html__( 'Tumblr', 'otter-blocks', 'themeisle-companion' ),
+				'icon'  => 'tumblr',
+				'url'   => 'https://tumblr.com/share/link?url=' . esc_url( get_the_permalink() ) . '&name=' . esc_attr( get_the_title() ),
+			),
+
+			'reddit'    => array(
+				'label' => esc_html__( 'Reddit', 'otter-blocks', 'themeisle-companion' ),
+				'icon'  => 'reddit-alien',
+				'url'   => 'https://www.reddit.com/submit?url=' . esc_url( get_the_permalink() ),
+			),
+		);
+
+		return $social_attributes;
+	}
+
+	/**
 	 * Block render function for server-side.
 	 *
 	 * This method will pe passed to the render_callback parameter and it will output
@@ -121,6 +122,8 @@ class Sharing_Icons_Block extends Base_Block {
 	 * @return mixed|string
 	 */
 	protected function render( $attributes ) {
+		$social_attributes = $this->get_social_profiles();
+
 		if ( isset( $attributes['className'] ) && strpos( $attributes['className'], 'is-style-icons' ) !== false ) {
 			$class = 'wp-block-themeisle-blocks-sharing-icons';
 		} else {
@@ -136,7 +139,7 @@ class Sharing_Icons_Block extends Base_Block {
 		}
 
 		$html = '<div class="' . esc_attr( $class ) . '">';
-		foreach ( $this->social_attributes as $key => $icon ) {
+		foreach ( $social_attributes as $key => $icon ) {
 			if ( 'className' !== $key && 1 == $attributes[ $key ] ) {
 				$html .= '<a class="social-icon is-' . esc_html( $key ) . '" href="' . esc_url( $icon['url'] ) . '" target="_blank">';
 				$html .= '<i class="fab fa-' . esc_html( $icon['icon'] ) . '"></i>';

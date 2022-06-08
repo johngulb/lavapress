@@ -73,7 +73,15 @@ abstract class Orbit_Fox_Module_Abstract {
 	 * @access  protected
 	 * @var     boolean $active_default The default active state of the module.
 	 */
-	protected $active_default = false;
+	public $active_default = false;
+	/**
+	 * True if the page should refresh after the module is enabled
+	 *
+	 * @access  protected
+	 * @var     boolean $refresh_after_enabled Flag for page refresh after activation
+	 */
+	public $refresh_after_enabled = false;
+
 	/**
 	 * Stores an array of notices
 	 *
@@ -303,6 +311,51 @@ abstract class Orbit_Fox_Module_Abstract {
 			return false;
 		}
 		return $this->model->get_is_module_active( $this->slug, $this->active_default );
+	}
+
+	/**
+	 * Function that retrieves the status of the module directly from the database.
+	 * When calling this method, the model does not need to be initialized as we need for the get_is_active method.
+	 *
+	 * @return bool
+	 */
+	protected function is_module_active() {
+		$data = get_option( 'obfx_data' );
+		if ( ! is_array( $data ) ) {
+			return false;
+		}
+		if ( ! array_key_exists( 'module_status', $data ) ) {
+			return false;
+		}
+		if ( ! array_key_exists( $this->slug, $data['module_status'] ) ) {
+			return false;
+		}
+		return isset( $data['module_status'][ $this->slug ]['active'] ) ? $data['module_status'][ $this->slug ]['active'] : $this->active_default;
+	}
+
+	/**
+	 * Get module setting.
+	 *
+	 * @param string $parameter Setting to retrieve.
+	 *
+	 * @return false | mixed
+	 */
+	protected function get_module_setting( $parameter ) {
+		$data = get_option( 'obfx_data' );
+		if ( ! is_array( $data ) ) {
+			return false;
+		}
+		if ( ! array_key_exists( 'module_settings', $data ) ) {
+			return false;
+		}
+		if ( ! array_key_exists( $this->slug, $data['module_settings'] ) ) {
+			return false;
+		}
+		if ( ! array_key_exists( $parameter, $data['module_settings'][ $this->slug ] ) ) {
+			return false;
+		}
+
+		return $data['module_settings'][ $this->slug ][ $parameter ];
 	}
 
 	/**
@@ -557,8 +610,6 @@ abstract class Orbit_Fox_Module_Abstract {
 	 * @param   string $prefix The string to prefix in the enqueued name.
 	 */
 	private function set_scripts( $enqueue, $prefix ) {
-		$sanitized = str_replace( ' ', '-', strtolower( $this->name ) );
-
 		$module_dir = $this->slug;
 
 		if ( ! empty( $enqueue ) ) {
@@ -582,7 +633,7 @@ abstract class Orbit_Fox_Module_Abstract {
 					if ( ! filter_var( $url, FILTER_VALIDATE_URL ) === false ) {
 						$resource = $url;
 					}
-					$id                = 'obfx-module-' . $prefix . '-js-' . $sanitized . '-' . $order;
+					$id                = 'obfx-module-' . $prefix . '-js-' . $module_dir . '-' . $order;
 					$map[ $file_name ] = $id;
 
 					wp_enqueue_script(
@@ -597,7 +648,7 @@ abstract class Orbit_Fox_Module_Abstract {
 					if ( array_key_exists( $file_name, $this->localized ) ) {
 						wp_localize_script(
 							$id,
-							str_replace( '-', '_', $sanitized ),
+							str_replace( '-', '_', $module_dir ),
 							$this->localized[ $file_name ]
 						);
 					}
@@ -737,5 +788,40 @@ abstract class Orbit_Fox_Module_Abstract {
 		update_option( 'obfx_beta_show_' . $this->get_slug(), $luck ? 'yes' : 'no' );
 
 		return $luck;
+	}
+
+	/**
+	 * Check if it's a new user for orbit fox.
+	 *
+	 * @param string $option_name Parameter to be able to check for new users in different period of time.
+	 *
+	 * @return bool
+	 */
+	protected function check_new_user( $option_name = 'obfx_new_user' ) {
+		$is_new_user = get_option( $option_name );
+		if ( $is_new_user === 'yes' ) {
+			return true;
+		}
+
+		$check_time_option = $option_name === 'obfx_new_user' ? 'module_check_time' : $option_name . '_check_time';
+		$install_time      = get_option( 'themeisle_companion_install' );
+		$current_time      = get_option( $check_time_option );
+
+		if ( empty( $current_time ) ) {
+			$current_time = time();
+			update_option( $check_time_option, $current_time );
+		}
+		if ( empty( $install_time ) || empty( $current_time ) ) {
+			update_option( $option_name, 'no' );
+			return false;
+		}
+
+		if ( ( $current_time - $install_time ) <= 60 ) {
+			update_option( $option_name, 'yes' );
+			return true;
+		}
+
+		update_option( $option_name, 'no' );
+		return false;
 	}
 }

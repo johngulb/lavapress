@@ -51,15 +51,18 @@ class Plugin_Card_Server {
 			'/get_plugins',
 			array(
 				array(
-					'methods'  => \WP_REST_Server::READABLE,
-					'callback' => array( $this, 'search' ),
-					'args'     => array(
+					'methods'             => \WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'search' ),
+					'args'                => array(
 						'search' => array(
 							'type'        => 'string',
 							'required'    => true,
-							'description' => __( 'Search query.', 'textdomain' ),
+							'description' => __( 'Search query.', 'otter-blocks', 'themeisle-companion' ),
 						),
 					),
+					'permission_callback' => function () {
+						return current_user_can( 'edit_posts' );
+					},
 				),
 			)
 		);
@@ -69,15 +72,18 @@ class Plugin_Card_Server {
 			'/get_plugin',
 			array(
 				array(
-					'methods'  => \WP_REST_Server::READABLE,
-					'callback' => array( $this, 'get' ),
-					'args'     => array(
+					'methods'             => \WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get' ),
+					'args'                => array(
 						'slug' => array(
 							'type'        => 'string',
 							'required'    => true,
-							'description' => __( 'Slug of the plugin.', 'textdomain' ),
+							'description' => __( 'Slug of the plugin.', 'otter-blocks', 'themeisle-companion' ),
 						),
 					),
+					'permission_callback' => function () {
+						return current_user_can( 'edit_posts' );
+					},
 				),
 			)
 		);
@@ -99,7 +105,7 @@ class Plugin_Card_Server {
 
 		$return = array(
 			'success' => false,
-			'data'    => esc_html__( 'Something went wrong', 'textdomain' ),
+			'data'    => esc_html__( 'Something went wrong', 'otter-blocks', 'themeisle-companion' ),
 		);
 
 		$search = $request->get_param( 'search' );
@@ -160,7 +166,7 @@ class Plugin_Card_Server {
 
 		$return = array(
 			'success' => false,
-			'data'    => esc_html__( 'Something went wrong', 'textdomain' ),
+			'data'    => esc_html__( 'Something went wrong', 'otter-blocks', 'themeisle-companion' ),
 		);
 
 		$slug = $request->get_param( 'slug' );
@@ -234,7 +240,7 @@ class Plugin_Card_Server {
 	 */
 	public function __clone() {
 		// Cloning instances of the class is forbidden.
-		_doing_it_wrong( __FUNCTION__, esc_html__( 'Cheatin&#8217; huh?', 'textdomain' ), '1.0.0' );
+		_doing_it_wrong( __FUNCTION__, esc_html__( 'Cheatin&#8217; huh?', 'otter-blocks', 'themeisle-companion' ), '1.0.0' );
 	}
 
 	/**
@@ -246,6 +252,6 @@ class Plugin_Card_Server {
 	 */
 	public function __wakeup() {
 		// Unserializing instances of the class is forbidden.
-		_doing_it_wrong( __FUNCTION__, esc_html__( 'Cheatin&#8217; huh?', 'textdomain' ), '1.0.0' );
+		_doing_it_wrong( __FUNCTION__, esc_html__( 'Cheatin&#8217; huh?', 'otter-blocks', 'themeisle-companion' ), '1.0.0' );
 	}
 }

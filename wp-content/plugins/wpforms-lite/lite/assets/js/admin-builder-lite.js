@@ -1,6 +1,17 @@
-;(function($) {
+/* global wpforms_builder_lite, wpforms_builder */
 
-	var WPFormsBuilderLite = {
+'use strict';
+
+var WPFormsBuilderLite = window.WPFormsBuilderLite || ( function( document, window, $ ) {
+
+	/**
+	 * Public functions and properties.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @type {object}
+	 */
+	var app = {
 
 		/**
 		 * Start the engine.
@@ -10,11 +21,9 @@
 		init: function() {
 
 			// Document ready
-			$(document).ready(function() {
-				WPFormsBuilderLite.ready();
-			});
+			$( app.ready() );
 
-			WPFormsBuilderLite.bindUIActions();
+			app.bindUIActions();
 		},
 
 		/**
@@ -22,8 +31,7 @@
 		 *
 		 * @since 1.0.0
 		 */
-		ready: function() {
-		},
+		ready: function() {},
 
 		/**
 		 * Element bindings.
@@ -34,7 +42,8 @@
 
 			// Warn users if they disable email notifications.
 			$( document ).on( 'change', '#wpforms-panel-field-settings-notification_enable', function() {
-				WPFormsBuilderLite.formBuilderNotificationAlert( $( this ).val() );
+
+				app.formBuilderNotificationAlert( $( this ).is( ':checked' ) );
 			} );
 		},
 
@@ -42,31 +51,34 @@
 		 * Warn users if they disable email notifications.
 		 *
 		 * @since 1.5.0
+		 *
+		 * @param {string} value Whether notifications enabled or not. 0 is disabled, 1 is enabled.
 		 */
 		formBuilderNotificationAlert: function( value ) {
 
-			if ( '0' !== value ) {
+			if ( value !== false ) {
 				return;
 			}
 
 			$.alert( {
 				title: wpforms_builder.heads_up,
 				content: wpforms_builder_lite.disable_notifications,
-				backgroundDismiss: false,
-				closeIcon: false,
 				icon: 'fa fa-exclamation-circle',
 				type: 'orange',
 				buttons: {
 					confirm: {
 						text: wpforms_builder.ok,
 						btnClass: 'btn-confirm',
-						keys: [ 'enter' ]
-					}
-				}
+						keys: [ 'enter' ],
+					},
+				},
 			} );
-		}
+		},
 	};
 
-	WPFormsBuilderLite.init();
+	// Provide access to public functions/properties.
+	return app;
 
-})(jQuery);
+}( document, window, jQuery ) );
+
+WPFormsBuilderLite.init();

@@ -20,6 +20,20 @@ class Base_CSS {
 	protected $library_prefix = 'themeisle-blocks';
 
 	/**
+	 * Rest route namespace.
+	 *
+	 * @var string
+	 */
+	public $namespace = 'themeisle-gutenberg-blocks/';
+
+	/**
+	 * Rest route version.
+	 *
+	 * @var string
+	 */
+	public $version = 'v1';
+
+	/**
 	 * The namespace under which the block classees are saved.
 	 *
 	 * @var string
@@ -52,11 +66,19 @@ class Base_CSS {
 	 */
 	public function autoload_block_classes() {
 		self::$blocks_classes = array(
+			'\ThemeIsle\GutenbergBlocks\CSS\Blocks\Accordion_CSS',
 			'\ThemeIsle\GutenbergBlocks\CSS\Blocks\Advanced_Column_CSS',
 			'\ThemeIsle\GutenbergBlocks\CSS\Blocks\Advanced_Columns_CSS',
 			'\ThemeIsle\GutenbergBlocks\CSS\Blocks\Advanced_Heading_CSS',
 			'\ThemeIsle\GutenbergBlocks\CSS\Blocks\Button_Group_CSS',
+			'\ThemeIsle\GutenbergBlocks\CSS\Blocks\Button_CSS',
+			'\ThemeIsle\GutenbergBlocks\CSS\Blocks\Circle_Counter_CSS',
 			'\ThemeIsle\GutenbergBlocks\CSS\Blocks\Font_Awesome_Icons_CSS',
+			'\ThemeIsle\GutenbergBlocks\CSS\Blocks\Icon_List_CSS',
+			'\ThemeIsle\GutenbergBlocks\CSS\Blocks\Icon_List_Item_CSS',
+			'\ThemeIsle\GutenbergBlocks\CSS\Blocks\Progress_Bar_CSS',
+			'\ThemeIsle\GutenbergBlocks\CSS\Blocks\Review_CSS',
+			'\ThemeIsle\GutenbergBlocks\CSS\Blocks\Tabs_CSS',
 		);
 	}
 
@@ -331,7 +353,7 @@ class Base_CSS {
 	 */
 	public function __clone() {
 		// Cloning instances of the class is forbidden.
-		_doing_it_wrong( __FUNCTION__, esc_html__( 'Cheatin&#8217; huh?', 'textdomain' ), '1.0.0' );
+		_doing_it_wrong( __FUNCTION__, 'Cheatin&#8217; huh?', '1.0.0' );
 	}
 
 	/**
@@ -343,6 +365,6 @@ class Base_CSS {
 	 */
 	public function __wakeup() {
 		// Unserializing instances of the class is forbidden.
-		_doing_it_wrong( __FUNCTION__, esc_html__( 'Cheatin&#8217; huh?', 'textdomain' ), '1.0.0' );
+		_doing_it_wrong( __FUNCTION__, 'Cheatin&#8217; huh?', '1.0.0' );
 	}
 }

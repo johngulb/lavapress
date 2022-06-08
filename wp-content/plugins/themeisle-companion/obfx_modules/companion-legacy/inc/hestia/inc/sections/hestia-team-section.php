@@ -39,21 +39,33 @@ if ( ! function_exists( 'hestia_team' ) ) :
 		$section_is_empty     = empty( $hestia_team_title ) && empty( $hestia_team_subtitle ) && empty( $hestia_team_content );
 
 		$hide_section = get_theme_mod( 'hestia_team_hide', false );
-
-		/* Don't show section if Disable section is checked or it doesn't have any content. Show it if it's called as a shortcode */
+		$section_style        = '';
+		/**
+		 * Don't show section if Disable section is checked or it doesn't have any content.
+		 * Show it if it's called as a shortcode.
+		 */
 		if ( ( $is_shortcode === false ) && ( $section_is_empty || (bool) $hide_section === true ) ) {
 			if ( is_customize_preview() ) {
-				echo '<section class="hestia-team" id="team" data-sorder="hestia_team" style="display: none"></section>';
+				$section_style = 'style="display: none"';
+			} else {
+				return;
 			}
-			return;
 		}
 
 		$wrapper_class   = $is_shortcode === true ? 'is-shortcode' : '';
 		$container_class = $is_shortcode === true ? '' : 'container';
 
+		if( function_exists( 'maybe_trigger_fa_loading' ) ){
+			$html_allowed_strings = array(
+				$hestia_team_title,
+				$hestia_team_subtitle,
+			);
+			maybe_trigger_fa_loading( $html_allowed_strings );
+		}
+
 		hestia_before_team_section_trigger();
 		?>
-		<section class="hestia-team <?php echo esc_attr( $wrapper_class ); ?>" id="team" data-sorder="hestia_team">
+		<section class="hestia-team <?php echo esc_attr( $wrapper_class ); ?>" id="team" data-sorder="hestia_team" <?php echo wp_kses_post( $section_style ); ?>>
 			<?php
 			hestia_before_team_section_content_trigger();
 			if ( function_exists( 'hestia_display_customizer_shortcut' ) && $is_shortcode === false ) {
@@ -101,139 +113,137 @@ endif;
  * @access public
  * @param string $hestia_team_content Section content in json format.
  * @param bool   $is_callback Flag to check if it's callback or not.
+ *
+ * @return bool
  */
 function hestia_team_content( $hestia_team_content, $is_callback = false ) {
-	if ( ! $is_callback ) {
-		?>
-		<div class="hestia-team-content">
-		<?php
+	
+	if ( empty( $hestia_team_content ) ) {
+		return false;
 	}
-	?>
-		<?php
-		if ( ! empty( $hestia_team_content ) ) :
-			$hestia_team_content = json_decode( $hestia_team_content );
-
-			if ( ! empty( $hestia_team_content ) ) {
-				echo '<div class="row">';
-				foreach ( $hestia_team_content as $team_item ) :
-					$image    = ! empty( $team_item->image_url ) ? apply_filters( 'hestia_translate_single_string', $team_item->image_url, 'Team section' ) : '';
-					$title    = ! empty( $team_item->title ) ? apply_filters( 'hestia_translate_single_string', $team_item->title, 'Team section' ) : '';
-					$subtitle = ! empty( $team_item->subtitle ) ? apply_filters( 'hestia_translate_single_string', $team_item->subtitle, 'Team section' ) : '';
-					$text     = ! empty( $team_item->text ) ? apply_filters( 'hestia_translate_single_string', $team_item->text, 'Team section' ) : '';
-					$link     = ! empty( $team_item->link ) ? apply_filters( 'hestia_translate_single_string', $team_item->link, 'Team section' ) : '';
-					?>
-					<div class="col-xs-12 col-ms-6 col-sm-6">
-						<div class="card card-profile card-plain">
-							<div class="col-md-5">
-								<div class="card-image">
-									<?php
-									if ( ! empty( $image ) ) :
-										/**
-										 * Alternative text for the Team box image
-										 * It first checks for the Alt Text option of the attachment
-										 * If that field is empty, uses the Title of the Testimonial box as alt text
-										 */
-										$alt_image = '';
-										$image_id  = function_exists( 'attachment_url_to_postid' ) ? attachment_url_to_postid( preg_replace( '/-\d{1,4}x\d{1,4}/i', '', $image ) ) : '';
-										if ( ! empty( $image_id ) && $image_id !== 0 ) {
-											$alt_image = get_post_meta( $image_id, '_wp_attachment_image_alt', true );
-										}
-										if ( empty( $alt_image ) ) {
-											if ( ! empty( $title ) ) {
-												$alt_image = $title;
-											}
-										}
-										if ( ! empty( $link ) ) :
-											$link_html = '<a href="' . esc_url( $link ) . '"';
-											if ( function_exists( 'hestia_is_external_url' ) ) {
-												$link_html .= hestia_is_external_url( $link );
-											}
-											$link_html .= '>';
-											echo wp_kses_post( $link_html );
-										endif;
-										echo '<img class="img" src="' . esc_url( $image ) . '" ';
-										if ( ! empty( $alt_image ) ) {
-											echo ' alt="' . esc_attr( $alt_image ) . '" ';
-										}
-										if ( ! empty( $title ) ) {
-											echo ' title="' . esc_attr( $title ) . '" ';
-										}
-										echo '/>';
-										if ( ! empty( $link ) ) {
-											echo '</a>';
-										}
-										?>
-									<?php endif; ?>
-								</div>
-							</div>
-							<div class="col-md-7">
-								<div class="content">
-									<?php
-									if ( ! empty( $link ) ) :
-										$link_html = '<a href="' . esc_url( $link ) . '"';
-										if ( function_exists( 'hestia_is_external_url' ) ) {
-											$link_html .= hestia_is_external_url( $link );
-										}
-										$link_html .= '>';
-										echo wp_kses_post( $link_html );
-									endif;
-									?>
-									<?php if ( ! empty( $title ) ) : ?>
-										<h4 class="card-title"><?php echo esc_html( $title ); ?></h4>
-									<?php endif; ?>
-									<?php if ( ! empty( $subtitle ) ) : ?>
-										<h6 class="category text-muted"><?php echo esc_html( $subtitle ); ?></h6>
-									<?php endif; ?>
-									<?php if ( ! empty( $text ) ) : ?>
-										<p class="card-description"><?php echo wp_kses_post( html_entity_decode( $text ) ); ?></p>
-									<?php endif; ?>
-									<?php
-									if ( ! empty( $link ) ) {
-										echo '</a>';
-									}
-									?>
-									<?php
-									if ( ! empty( $team_item->social_repeater ) ) :
-										$icons         = html_entity_decode( $team_item->social_repeater );
-										$icons_decoded = json_decode( $icons, true );
-										if ( ! empty( $icons_decoded ) ) :
-											?>
-											<div class="footer">
-												<?php
-												foreach ( $icons_decoded as $value ) {
-													$social_icon = ! empty( $value['icon'] ) ? apply_filters( 'hestia_translate_single_string', $value['icon'], 'Team section' ) : '';
-													$social_link = ! empty( $value['link'] ) ? apply_filters( 'hestia_translate_single_string', $value['link'], 'Team section' ) : '';
-
-													if ( ! empty( $social_icon ) ) {
-														$link = '<a href="' . esc_url( $social_link ) . '"';
-														if ( function_exists( 'hestia_is_external_url' ) ) {
-															$link .= hestia_is_external_url( $social_link );
-														}
-														$link .= ' class="btn btn-just-icon btn-simple"><i class="fa ' . esc_attr( $social_icon ) . '"></i></a>';
-														echo $link;
-													}
-												}
-												?>
-											</div>
-											<?php
-										endif;
-									endif;
-									?>
-								</div>
-							</div>
-						</div>
-					</div>
-					<?php
-				endforeach;
-				echo '</div>';
-			}// End if().
-		endif;
-		if ( ! $is_callback ) {
-			?>
-			</div>
-			<?php
+	
+	$hestia_team_content = json_decode( $hestia_team_content );
+	if ( empty( $hestia_team_content ) ) {
+		return false;
+	}
+	
+	if ( ! $is_callback ) {
+		echo '<div class="hestia-team-content">';
+	}
+	echo '<div class="row">';
+	
+	foreach ( $hestia_team_content as $team_item ) {
+		$image    = ! empty( $team_item->image_url ) ? apply_filters( 'hestia_translate_single_string', $team_item->image_url, 'Team section' ) : '';
+		$title    = ! empty( $team_item->title ) ? apply_filters( 'hestia_translate_single_string', $team_item->title, 'Team section' ) : '';
+		$subtitle = ! empty( $team_item->subtitle ) ? apply_filters( 'hestia_translate_single_string', $team_item->subtitle, 'Team section' ) : '';
+		$text     = ! empty( $team_item->text ) ? apply_filters( 'hestia_translate_single_string', $team_item->text, 'Team section' ) : '';
+		$link     = ! empty( $team_item->link ) ? apply_filters( 'hestia_translate_single_string', $team_item->link, 'Team section' ) : '';
+		
+		$data = array( $image, $title, $subtitle, $text, $link );
+		if ( ! array_filter( $data ) ) {
+			continue;
 		}
-
+		
+		$link_markup_open  = '';
+		$link_markup_close = '';
+		if ( ! empty( $link ) ) {
+			$link_markup_open = '<a href="' . esc_url( $link ) . '"';
+			if ( function_exists( 'hestia_is_external_url' ) ) {
+				$link_markup_open .= hestia_is_external_url( $link );
+			}
+			$link_markup_open .= '>';
+			
+			$link_markup_close = '</a>';
+		}
+		
+		if ( function_exists( 'maybe_trigger_fa_loading' ) ) {
+			maybe_trigger_fa_loading( $text );
+		}
+		
+		echo '<div class="col-xs-12 col-ms-6 col-sm-6">';
+		echo '<div class="card card-profile card-plain">';
+		echo '<div class="col-md-5">';
+		echo '<div class="card-image">';
+		
+		if ( ! empty( $image ) ) {
+			/**
+			 * Alternative text for the Team box image
+			 * It first checks for the Alt Text option of the attachment
+			 * If that field is empty, uses the Title of the Testimonial box as alt text
+			 */
+			$alt_image = $title;
+			$image_id  = function_exists( 'attachment_url_to_postid' ) ? attachment_url_to_postid( preg_replace( '/-\d{1,4}x\d{1,4}/i', '', $image ) ) : '';
+			if ( ! empty( $image_id ) && $image_id !== 0 ) {
+				$alt_image = get_post_meta( $image_id, '_wp_attachment_image_alt', true );
+			}
+			
+			echo $link_markup_open;
+			
+			echo '<img class="img" src="' . esc_url( $image ) . '" ';
+			if ( ! empty( $alt_image ) ) {
+				echo ' alt="' . esc_attr( $alt_image ) . '" ';
+			}
+			if ( ! empty( $title ) ) {
+				echo ' title="' . esc_attr( $title ) . '" ';
+			}
+			echo '/>';
+			
+			echo $link_markup_close;
+		}
+		echo '</div>';
+		echo '</div>';
+		
+		echo '<div class="col-md-7">';
+		echo '<div class="content">';
+		
+		echo $link_markup_open;
+		if ( ! empty( $title ) ) {
+			echo '<h4 class="card-title">' . esc_html( $title ) . '</h4>';
+		}
+		
+		if ( ! empty( $subtitle ) ) {
+			echo '<h6 class="category text-muted">' . esc_html( $subtitle ) . '</h6>';
+		}
+		
+		if ( ! empty( $text ) ) {
+			echo '<p class="card-description">' . wp_kses_post( html_entity_decode( $text ) ) . '</p>';
+		}
+		echo $link_markup_close;
+		
+		
+		if ( ! empty( $team_item->social_repeater ) ) {
+			$icons         = html_entity_decode( $team_item->social_repeater );
+			$icons_decoded = json_decode( $icons, true );
+			if ( ! empty( $icons_decoded ) ) {
+				echo '<div class="footer">';
+				foreach ( $icons_decoded as $value ) {
+					$social_icon = ! empty( $value['icon'] ) ? apply_filters( 'hestia_translate_single_string', $value['icon'], 'Team section' ) : '';
+					$social_link = ! empty( $value['link'] ) ? apply_filters( 'hestia_translate_single_string', $value['link'], 'Team section' ) : '';
+					
+					if ( ! empty( $social_icon ) ) {
+						$link = '<a href="' . esc_url( $social_link ) . '"';
+						if ( function_exists( 'hestia_is_external_url' ) ) {
+							$link .= hestia_is_external_url( $social_link );
+						}
+						$link .= ' class="btn btn-just-icon btn-simple"><i class="' . esc_attr( hestia_display_fa_icon( $social_icon ) ) . '"></i></a>';
+						echo $link;
+					}
+				}
+				echo '</div>';
+			}
+		}
+		
+		echo '</div>';
+		echo '</div>';
+		echo '</div>';
+		echo '</div>';
+	};
+	echo '</div>';
+	
+	if ( ! $is_callback ) {
+		echo '</div>';
+	}
+	return true;
 }
 
 
@@ -259,22 +269,22 @@ function hestia_get_team_default() {
 							array(
 								'id'   => 'customizer-repeater-social-repeater-57fb908674e06',
 								'link' => 'facebook.com',
-								'icon' => 'fa-facebook',
+								'icon' => 'fab fa-facebook-f',
 							),
 							array(
 								'id'   => 'customizer-repeater-social-repeater-57fb9148530ft',
 								'link' => 'plus.google.com',
-								'icon' => 'fa-google-plus',
+								'icon' => 'fab fa-google-plus-g',
 							),
 							array(
 								'id'   => 'customizer-repeater-social-repeater-57fb9148530fc',
 								'link' => 'twitter.com',
-								'icon' => 'fa-twitter',
+								'icon' => 'fab fa-twitter',
 							),
 							array(
 								'id'   => 'customizer-repeater-social-repeater-57fb9150e1e89',
 								'link' => 'linkedin.com',
-								'icon' => 'fa-linkedin',
+								'icon' => 'fab fa-linkedin-in',
 							),
 						)
 					),
@@ -290,22 +300,22 @@ function hestia_get_team_default() {
 							array(
 								'id'   => 'customizer-repeater-social-repeater-57fb9155a1072',
 								'link' => 'facebook.com',
-								'icon' => 'fa-facebook',
+								'icon' => 'fab fa-facebook-f',
 							),
 							array(
 								'id'   => 'customizer-repeater-social-repeater-57fb9160ab683',
 								'link' => 'twitter.com',
-								'icon' => 'fa-twitter',
+								'icon' => 'fab fa-google-plus-g',
 							),
 							array(
 								'id'   => 'customizer-repeater-social-repeater-57fb9160ab484',
 								'link' => 'pinterest.com',
-								'icon' => 'fa-pinterest',
+								'icon' => 'fab fa-twitter',
 							),
 							array(
 								'id'   => 'customizer-repeater-social-repeater-57fb916ddffc9',
 								'link' => 'linkedin.com',
-								'icon' => 'fa-linkedin',
+								'icon' => 'fab fa-linkedin-in',
 							),
 						)
 					),
@@ -321,22 +331,22 @@ function hestia_get_team_default() {
 							array(
 								'id'   => 'customizer-repeater-social-repeater-57fb917e4c69e',
 								'link' => 'facebook.com',
-								'icon' => 'fa-facebook',
+								'icon' => 'fab fa-facebook-f',
 							),
 							array(
 								'id'   => 'customizer-repeater-social-repeater-57fb91830825c',
 								'link' => 'twitter.com',
-								'icon' => 'fa-twitter',
+								'icon' => 'fab fa-google-plus-g',
 							),
 							array(
 								'id'   => 'customizer-repeater-social-repeater-57fb918d65f2e',
 								'link' => 'linkedin.com',
-								'icon' => 'fa-linkedin',
+								'icon' => 'fab fa-twitter',
 							),
 							array(
 								'id'   => 'customizer-repeater-social-repeater-57fb918d65f2x',
 								'link' => 'dribbble.com',
-								'icon' => 'fa-dribbble',
+								'icon' => 'fab fa-linkedin-in',
 							),
 						)
 					),
@@ -352,22 +362,22 @@ function hestia_get_team_default() {
 							array(
 								'id'   => 'customizer-repeater-social-repeater-57fb925cedcg5',
 								'link' => 'github.com',
-								'icon' => 'fa-github-square',
+								'icon' => 'fab fa-facebook-f',
 							),
 							array(
 								'id'   => 'customizer-repeater-social-repeater-57fb925cedcb2',
 								'link' => 'facebook.com',
-								'icon' => 'fa-facebook',
+								'icon' => 'fab fa-google-plus-g',
 							),
 							array(
 								'id'   => 'customizer-repeater-social-repeater-57fb92615f030',
 								'link' => 'twitter.com',
-								'icon' => 'fa-twitter',
+								'icon' => 'fab fa-twitter',
 							),
 							array(
 								'id'   => 'customizer-repeater-social-repeater-57fb9266c223a',
 								'link' => 'linkedin.com',
-								'icon' => 'fa-linkedin',
+								'icon' => 'fab fa-linkedin-in',
 							),
 						)
 					),

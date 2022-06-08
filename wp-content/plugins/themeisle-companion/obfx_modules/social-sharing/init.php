@@ -53,11 +53,6 @@ class Social_Sharing_OBFX_Module extends Orbit_Fox_Module_Abstract {
 				'nicename' => 'Twitter',
 				'icon'     => 'twitter',
 			),
-			'g-plus'    => array(
-				'link'     => 'https://plus.google.com/share?url=' . $post_link,
-				'nicename' => 'Google Plus',
-				'icon'     => 'googleplus',
-			),
 			'pinterest' => array(
 				'link'     => 'https://pinterest.com/pin/create/bookmarklet/?media=' . get_the_post_thumbnail_url() . '&url=' . $post_link . '&description=' . $post_title,
 				'nicename' => 'Pinterest',
@@ -131,6 +126,11 @@ class Social_Sharing_OBFX_Module extends Orbit_Fox_Module_Abstract {
 				'nicename' => 'Weibo',
 				'icon'     => 'weibo',
 			),
+			'telegram'  => array(
+				'link'     => 'https://t.me/share/url?url=' . $post_link . '&text=' . $post_title,
+				'nicename' => 'Telegram',
+				'icon'     => 'telegram',
+			),
 		);
 	}
 
@@ -178,6 +178,10 @@ class Social_Sharing_OBFX_Module extends Orbit_Fox_Module_Abstract {
 	 * @access  public
 	 */
 	public function social_sharing_function() {
+		if ( class_exists( 'WooCommerce' ) && ( is_cart() || is_checkout() ) ) {
+			return false;
+		}
+
 		if ( ( $this->get_option( 'display_on_posts' ) && is_single() ) || ( $this->get_option( 'display_on_pages' ) && is_page() ) ) {
 			$class_desktop = 'obfx-sharing-left ';
 			switch ( $this->get_option( 'socials_position' ) ) {
@@ -283,24 +287,7 @@ class Social_Sharing_OBFX_Module extends Orbit_Fox_Module_Abstract {
 	 * @return array
 	 */
 	public function admin_enqueue() {
-
-		$current_screen = get_current_screen();
-		if ( ! isset( $current_screen->id ) ) {
-			return array();
-		}
-		if ( $current_screen->id != 'toplevel_page_obfx_companion' ) {
-			return array();
-		}
-
-		return array(
-			'css' => array(
-				'admin'                  => false,
-				'vendor/socicon/socicon' => false,
-			),
-			'js'  => array(
-				'admin' => array( 'jquery' ),
-			),
-		);
+		return array();
 	}
 
 	/**

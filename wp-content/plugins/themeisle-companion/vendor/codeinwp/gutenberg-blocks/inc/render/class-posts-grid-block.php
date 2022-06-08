@@ -14,7 +14,6 @@ use ThemeIsle\GutenbergBlocks\Base_Block;
  */
 class Posts_Grid_Block extends Base_Block {
 
-
 	/**
 	 * Every block needs a slug, so we need to define one and assign it to the `$this->block_slug` property
 	 */
@@ -45,7 +44,10 @@ class Posts_Grid_Block extends Base_Block {
 				),
 			),
 			'categories'           => array(
-				'type' => 'string',
+				'type'  => 'array',
+				'items' => array(
+					'type' => 'object',
+				),
 			),
 			'postsToShow'          => array(
 				'type'    => 'number',
@@ -58,6 +60,10 @@ class Posts_Grid_Block extends Base_Block {
 			'orderBy'              => array(
 				'type'    => 'string',
 				'default' => 'date',
+			),
+			'offset'               => array(
+				'type'    => 'number',
+				'default' => 0,
 			),
 			'imageSize'            => array(
 				'type'    => 'string',
@@ -117,13 +123,50 @@ class Posts_Grid_Block extends Base_Block {
 	 * @return mixed|string
 	 */
 	protected function render( $attributes ) {
-		$recent_posts = wp_get_recent_posts(
-			array(
-				'numberposts' => $attributes['postsToShow'],
-				'post_status' => 'publish',
-				'order'       => $attributes['order'],
-				'orderby'     => $attributes['orderBy'],
-				'category'    => isset( $attributes['categories'] ) ? $attributes['categories'] : 0,
+		$categories = 0;
+
+		if ( isset( $attributes['categories'] ) ) {
+			$cats = array();
+
+			foreach ( $attributes['categories'] as $category ) {
+				array_push( $cats, $category['id'] );
+			}
+
+			$categories = join( ', ', $cats );
+		}
+
+		$get_custom_post_types_posts = function ( $post_type ) use ( $attributes, $categories ) {
+			return wp_get_recent_posts(
+				apply_filters(
+					'themeisle_gutenberg_posts_block_query',
+					array(
+						'post_type'        => $post_type,
+						'numberposts'      => $attributes['postsToShow'],
+						'post_status'      => 'publish',
+						'order'            => $attributes['order'],
+						'orderby'          => $attributes['orderBy'],
+						'offset'           => $attributes['offset'],
+						'category'         => $categories,
+						'suppress_filters' => false,
+					),
+					$attributes
+				)
+			);
+		};
+
+		$recent_posts = isset( $attributes['postTypes'] ) ? array_merge( ...array_map( $get_custom_post_types_posts, $attributes['postTypes'] ) ) : wp_get_recent_posts(
+			apply_filters(
+				'themeisle_gutenberg_posts_block_query',
+				array(
+					'numberposts'      => $attributes['postsToShow'],
+					'post_status'      => 'publish',
+					'order'            => $attributes['order'],
+					'orderby'          => $attributes['orderBy'],
+					'offset'           => $attributes['offset'],
+					'category'         => $categories,
+					'suppress_filters' => false,
+				),
+				$attributes
 			)
 		);
 
@@ -140,9 +183,9 @@ class Posts_Grid_Block extends Base_Block {
 			if ( isset( $attributes['displayFeaturedImage'] ) && $attributes['displayFeaturedImage'] ) {
 				if ( $thumbnail ) {
 					$list_items_markup .= sprintf(
-						'<div class="wp-block-themeisle-blocks-posts-grid-post-image"><a href="%1$s"><img src="%2$s" alt="%3$s" /></a></div>',
+						'<div class="wp-block-themeisle-blocks-posts-grid-post-image"><a href="%1$s">%2$s</a></div>',
 						esc_url( get_the_permalink( $id ) ),
-						esc_url( $thumbnail[0] ),
+						wp_get_attachment_image( get_post_thumbnail_id( $id ), $size ),
 						esc_html( get_the_title( $id ) )
 					);
 				}
@@ -152,7 +195,7 @@ class Posts_Grid_Block extends Base_Block {
 
 			foreach ( $attributes['template'] as $element ) {
 				if ( 'category' === $element ) {
-					if ( isset( $attributes['displayCategory'] ) && $attributes['displayCategory'] ) {
+					if ( isset( $attributes['displayCategory'] ) && isset( $category[0] ) && $attributes['displayCategory'] ) {
 						$list_items_markup .= sprintf(
 							'<span class="wp-block-themeisle-blocks-posts-grid-post-category">%1$s</span>',
 							esc_html( $category[0]->cat_name )
@@ -178,7 +221,7 @@ class Posts_Grid_Block extends Base_Block {
 						if ( isset( $attributes['displayDate'] ) && $attributes['displayDate'] ) {
 							$list_items_markup .= sprintf(
 								'%1$s <time datetime="%2$s">%3$s</time> ',
-								__( 'on', 'textdomain' ),
+								__( 'on', 'otter-blocks', 'themeisle-companion' ),
 								esc_attr( get_the_date( 'c', $id ) ),
 								esc_html( get_the_date( 'j F, Y', $id ) )
 							);
@@ -187,7 +230,7 @@ class Posts_Grid_Block extends Base_Block {
 						if ( isset( $attributes['displayAuthor'] ) && $attributes['displayAuthor'] ) {
 							$list_items_markup .= sprintf(
 								'%1$s %2$s',
-								__( 'by', 'textdomain' ),
+								__( 'by', 'otter-blocks', 'themeisle-companion' ),
 								get_the_author_meta( 'display_name', get_post_field( 'post_author', $id ) )
 							);
 						}
@@ -253,16 +296,10 @@ class Posts_Grid_Block extends Base_Block {
 	 * @return string
 	 */
 	protected function get_excerpt_by_id( $post_id, $excerpt_length = 200 ) {
-		if ( has_excerpt( $post_id ) ) {
-			$excerpt = get_the_excerpt( $post_id );
-		} else {
-			$post    = get_post( $post_id );
-			$excerpt = $post->post_content;
-			$excerpt = wp_strip_all_tags( strip_shortcodes( $excerpt ) );
-		}
+		$excerpt = get_the_excerpt( $post_id );
 
-		if ( strlen( $excerpt ) > $excerpt_length ) {
-			$excerpt = substr( $excerpt, 0, $excerpt_length ) . '…';
+		if ( mb_strlen( $excerpt ) > $excerpt_length ) {
+			$excerpt = mb_substr( $excerpt, 0, $excerpt_length ) . '…';
 		}
 
 		return $excerpt;

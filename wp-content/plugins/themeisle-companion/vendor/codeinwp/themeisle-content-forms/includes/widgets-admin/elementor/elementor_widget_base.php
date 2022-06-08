@@ -14,8 +14,8 @@ use Elementor\Group_Control_Typography;
 use Elementor\Icons_Manager;
 use Elementor\Plugin;
 use Elementor\Repeater;
-use Elementor\Scheme_Color;
-use Elementor\Scheme_Typography;
+use Elementor\Core\Schemes\Color;
+use Elementor\Core\Schemes\Typography;
 use Elementor\Widget_Base;
 use ThemeIsle\ContentForms\Form_Manager;
 
@@ -23,6 +23,8 @@ use ThemeIsle\ContentForms\Form_Manager;
  * Class Elementor_Base
  */
 abstract class Elementor_Widget_Base extends Widget_Base {
+
+	protected $field_types = array();
 
 	/**
 	 * All the widgets that extends this class have the same category.
@@ -54,7 +56,14 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 	/**
 	 * Register the controls for each Elementor Widget.
 	 */
-	protected function _register_controls() {
+	protected function register_controls() {
+		$this->field_types = array(
+			'text'     => __( 'Text', 'themeisle-companion' ),
+			'password' => __( 'Password', 'themeisle-companion' ),
+			'email'    => __( 'Email', 'themeisle-companion' ),
+			'textarea' => __( 'Textarea', 'themeisle-companion' ),
+		);
+
 		$this->register_form_fields();
 		$this->register_settings_controls();
 		$this->register_style_controls();
@@ -69,7 +78,7 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 		$this->start_controls_section(
 			$this->get_widget_type() . '_form_fields',
 			array(
-				'label' => __( 'Fields', 'textdomain' ),
+				'label' => __( 'Fields', 'themeisle-companion' ),
 			)
 		);
 		$repeater = new Repeater();
@@ -77,24 +86,21 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 		$repeater->add_control(
 			'requirement',
 			array(
-				'label'        => __( 'Required', 'textdomain' ),
+				'label'        => __( 'Required', 'themeisle-companion' ),
 				'type'         => Controls_Manager::SWITCHER,
 				'return_value' => 'required',
 				'default'      => '',
+				'condition'    => array(
+					'type!' => 'hidden',
+				),
 			)
 		);
 
-		$field_types = array(
-			'text'     => __( 'Text', 'textdomain' ),
-			'password' => __( 'Password', 'textdomain' ),
-			'email'    => __( 'Email', 'textdomain' ),
-			'textarea' => __( 'Textarea', 'textdomain' ),
-		);
-
+		$field_types = $this->get_specific_field_types();
 		$repeater->add_control(
 			'type',
 			array(
-				'label'   => __( 'Type', 'textdomain' ),
+				'label'   => __( 'Type', 'themeisle-companion' ),
 				'type'    => Controls_Manager::SELECT,
 				'options' => $field_types,
 				'default' => 'text',
@@ -104,7 +110,7 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 		$repeater->add_control(
 			'key',
 			array(
-				'label' => __( 'Key', 'textdomain' ),
+				'label' => __( 'Key', 'themeisle-companion' ),
 				'type'  => Controls_Manager::HIDDEN,
 			)
 		);
@@ -112,9 +118,9 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 		$repeater->add_responsive_control(
 			'field_width',
 			array(
-				'label'   => __( 'Field Width', 'textdomain' ),
-				'type'    => Controls_Manager::SELECT,
-				'options' => array(
+				'label'     => __( 'Field Width', 'themeisle-companion' ),
+				'type'      => Controls_Manager::SELECT,
+				'options'   => array(
 					'100' => '100%',
 					'75'  => '75%',
 					'66'  => '66%',
@@ -122,14 +128,17 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 					'33'  => '33%',
 					'25'  => '25%',
 				),
-				'default' => '100',
+				'default'   => '100',
+				'condition' => array(
+					'type!' => 'hidden',
+				),
 			)
 		);
 
 		$repeater->add_control(
 			'label',
 			array(
-				'label'   => __( 'Label', 'textdomain' ),
+				'label'   => __( 'Label', 'themeisle-companion' ),
 				'type'    => Controls_Manager::TEXT,
 				'default' => '',
 			)
@@ -138,22 +147,26 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 		$repeater->add_control(
 			'placeholder',
 			array(
-				'label'   => __( 'Placeholder', 'textdomain' ),
-				'type'    => Controls_Manager::TEXT,
-				'default' => '',
+				'label'     => __( 'Placeholder', 'themeisle-companion' ),
+				'type'      => Controls_Manager::TEXT,
+				'default'   => '',
+				'condition' => array(
+					'type!' => array( 'hidden', 'checkbox' ),
+				),
 			)
 		);
+
 		$this->add_repeater_specific_fields( $repeater );
 
 		$default_fields = $this->get_default_config();
 		$this->add_control(
 			'form_fields',
 			array(
-				'label'       => __( 'Form Fields', 'textdomain' ),
+				'label'       => __( 'Form Fields', 'themeisle-companion' ),
 				'type'        => Controls_Manager::REPEATER,
 				'show_label'  => false,
 				'separator'   => 'before',
-				'fields'      => array_values( $repeater->get_controls() ),
+				'fields'      => $repeater->get_controls(),
 				'default'     => $default_fields,
 				'title_field' => '{{{ label }}}',
 			)
@@ -163,7 +176,7 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 			'hide_label',
 			array(
 				'type'         => Controls_Manager::SWITCHER,
-				'label'        => __( 'Hide Label', 'textdomain' ),
+				'label'        => __( 'Hide Label', 'themeisle-companion' ),
 				'return_value' => 'hide',
 				'default'      => '',
 				'separator'    => 'before',
@@ -181,7 +194,7 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 		$this->start_controls_section(
 			'contact_form_settings',
 			array(
-				'label' => __( 'Form Settings', 'textdomain' ),
+				'label' => __( 'Form Settings', 'themeisle-companion' ),
 			)
 		);
 
@@ -201,7 +214,7 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 		$this->start_controls_section(
 			'section_form_style',
 			array(
-				'label' => __( 'Form', 'textdomain' ),
+				'label' => __( 'Form', 'themeisle-companion' ),
 				'tab'   => Controls_Manager::TAB_STYLE,
 			)
 		);
@@ -209,7 +222,7 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 		$this->add_control(
 			'column_gap',
 			array(
-				'label'     => __( 'Columns Gap', 'textdomain' ),
+				'label'     => __( 'Columns Gap', 'themeisle-companion' ),
 				'type'      => Controls_Manager::SLIDER,
 				'default'   => array(
 					'size' => 10,
@@ -230,7 +243,7 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 		$this->add_control(
 			'row_gap',
 			array(
-				'label'     => __( 'Rows Gap', 'textdomain' ),
+				'label'     => __( 'Rows Gap', 'themeisle-companion' ),
 				'type'      => Controls_Manager::SLIDER,
 				'default'   => array(
 					'size' => 10,
@@ -251,7 +264,7 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 		$this->add_control(
 			'heading_label',
 			array(
-				'label'     => __( 'Label', 'textdomain' ),
+				'label'     => __( 'Label', 'themeisle-companion' ),
 				'type'      => Controls_Manager::HEADING,
 				'separator' => 'before',
 			)
@@ -260,7 +273,7 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 		$this->add_control(
 			'label_spacing',
 			array(
-				'label'     => __( 'Spacing', 'textdomain' ),
+				'label'     => __( 'Spacing', 'themeisle-companion' ),
 				'type'      => Controls_Manager::SLIDER,
 				'default'   => array(
 					'size' => 0,
@@ -285,14 +298,14 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 		$this->add_control(
 			'label_color',
 			array(
-				'label'     => __( 'Text Color', 'textdomain' ),
+				'label'     => __( 'Text Color', 'themeisle-companion' ),
 				'type'      => Controls_Manager::COLOR,
 				'selectors' => array(
 					'{{WRAPPER}} fieldset > label, {{WRAPPER}} .elementor-field-subgroup label' => 'color: {{VALUE}};',
 				),
 				'scheme'    => array(
-					'type'  => Scheme_Color::get_type(),
-					'value' => Scheme_Color::COLOR_3,
+					'type'  => Color::get_type(),
+					'value' => Color::COLOR_3,
 				),
 			)
 		);
@@ -300,7 +313,7 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 		$this->add_control(
 			'mark_required_color',
 			array(
-				'label'     => __( 'Mark Color', 'textdomain' ),
+				'label'     => __( 'Mark Color', 'themeisle-companion' ),
 				'type'      => Controls_Manager::COLOR,
 				'default'   => '',
 				'selectors' => array(
@@ -314,7 +327,7 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 			array(
 				'name'     => 'label_typography',
 				'selector' => '{{WRAPPER}} fieldset > label',
-				'scheme'   => Scheme_Typography::TYPOGRAPHY_3,
+				'scheme'   => Typography::TYPOGRAPHY_3,
 			)
 		);
 		$this->end_controls_section();
@@ -322,7 +335,7 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 		$this->start_controls_section(
 			'section_field_style',
 			array(
-				'label' => __( 'Field', 'textdomain' ),
+				'label' => __( 'Field', 'themeisle-companion' ),
 				'tab'   => Controls_Manager::TAB_STYLE,
 			)
 		);
@@ -332,28 +345,28 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 			array(
 				'name'     => 'field_typography',
 				'selector' => '{{WRAPPER}} fieldset > input, {{WRAPPER}} fieldset select, {{WRAPPER}} fieldset > textarea, {{WRAPPER}} fieldset > button',
-				'scheme'   => Scheme_Typography::TYPOGRAPHY_3,
+				'scheme'   => Typography::TYPOGRAPHY_3,
 			)
 		);
 
 		$this->add_responsive_control(
 			'align_field_text',
 			array(
-				'label'     => __( 'Text alignment', 'textdomain' ),
+				'label'     => __( 'Text alignment', 'themeisle-companion' ),
 				'type'      => Controls_Manager::CHOOSE,
 				'toggle'    => false,
 				'default'   => 'left',
 				'options'   => array(
 					'left'   => array(
-						'title' => __( 'Left', 'textdomain' ),
+						'title' => __( 'Left', 'themeisle-companion' ),
 						'icon'  => 'fa fa-align-left',
 					),
 					'center' => array(
-						'title' => __( 'Center', 'textdomain' ),
+						'title' => __( 'Center', 'themeisle-companion' ),
 						'icon'  => 'fa fa-align-center',
 					),
 					'right'  => array(
-						'title' => __( 'Right', 'textdomain' ),
+						'title' => __( 'Right', 'themeisle-companion' ),
 						'icon'  => 'fa fa-align-right',
 					),
 				),
@@ -368,7 +381,7 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 		$this->add_responsive_control(
 			'field-text-padding',
 			array(
-				'label'      => __( 'Text Padding', 'textdomain' ),
+				'label'      => __( 'Text Padding', 'themeisle-companion' ),
 				'type'       => Controls_Manager::DIMENSIONS,
 				'size_units' => array( 'px', 'em', '%' ),
 				'selectors'  => array(
@@ -384,14 +397,14 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 		$this->start_controls_tab(
 			'tab_field_normal',
 			array(
-				'label' => __( 'Normal', 'textdomain' ),
+				'label' => __( 'Normal', 'themeisle-companion' ),
 			)
 		);
 
 		$this->add_control(
 			'field_text_color',
 			array(
-				'label'     => __( 'Text Color', 'textdomain' ),
+				'label'     => __( 'Text Color', 'themeisle-companion' ),
 				'type'      => Controls_Manager::COLOR,
 				'selectors' => array(
 					'{{WRAPPER}} fieldset > input'    => 'color: {{VALUE}};',
@@ -402,8 +415,8 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 					'{{WRAPPER}} fieldset > textarea::placeholder' => 'color: {{VALUE}};',
 				),
 				'scheme'    => array(
-					'type'  => Scheme_Color::get_type(),
-					'value' => Scheme_Color::COLOR_3,
+					'type'  => Color::get_type(),
+					'value' => Color::COLOR_3,
 				),
 			)
 		);
@@ -411,7 +424,7 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 		$this->add_control(
 			'field_background_color',
 			array(
-				'label'     => __( 'Background Color', 'textdomain' ),
+				'label'     => __( 'Background Color', 'themeisle-companion' ),
 				'type'      => Controls_Manager::COLOR,
 				'default'   => '#ffffff',
 				'selectors' => array(
@@ -426,7 +439,7 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 		$this->add_control(
 			'field_border_color',
 			array(
-				'label'     => __( 'Border Color', 'textdomain' ),
+				'label'     => __( 'Border Color', 'themeisle-companion' ),
 				'type'      => Controls_Manager::COLOR,
 				'selectors' => array(
 					'{{WRAPPER}} fieldset > input'    => 'border-color: {{VALUE}};',
@@ -440,15 +453,15 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 		$this->add_control(
 			'field_border_style',
 			array(
-				'label'     => _x( 'Border Type', 'Border Control', 'textdomain' ),
+				'label'     => _x( 'Border Type', 'Border Control', 'themeisle-companion' ),
 				'type'      => Controls_Manager::SELECT,
 				'options'   => array(
-					''       => __( 'None', 'textdomain' ),
-					'solid'  => _x( 'Solid', 'Border Control', 'textdomain' ),
-					'double' => _x( 'Double', 'Border Control', 'textdomain' ),
-					'dotted' => _x( 'Dotted', 'Border Control', 'textdomain' ),
-					'dashed' => _x( 'Dashed', 'Border Control', 'textdomain' ),
-					'groove' => _x( 'Groove', 'Border Control', 'textdomain' ),
+					''       => __( 'None', 'themeisle-companion' ),
+					'solid'  => _x( 'Solid', 'Border Control', 'themeisle-companion' ),
+					'double' => _x( 'Double', 'Border Control', 'themeisle-companion' ),
+					'dotted' => _x( 'Dotted', 'Border Control', 'themeisle-companion' ),
+					'dashed' => _x( 'Dashed', 'Border Control', 'themeisle-companion' ),
+					'groove' => _x( 'Groove', 'Border Control', 'themeisle-companion' ),
 				),
 				'selectors' => array(
 					'{{WRAPPER}} fieldset > input'    => 'border-style: {{VALUE}};',
@@ -461,7 +474,7 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 		$this->add_control(
 			'field_border_width',
 			array(
-				'label'       => __( 'Border Width', 'textdomain' ),
+				'label'       => __( 'Border Width', 'themeisle-companion' ),
 				'type'        => Controls_Manager::DIMENSIONS,
 				'placeholder' => '',
 				'size_units'  => array( 'px' ),
@@ -476,7 +489,7 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 		$this->add_control(
 			'field_border_radius',
 			array(
-				'label'      => __( 'Border Radius', 'textdomain' ),
+				'label'      => __( 'Border Radius', 'themeisle-companion' ),
 				'type'       => Controls_Manager::DIMENSIONS,
 				'size_units' => array( 'px', '%' ),
 				'selectors'  => array(
@@ -492,14 +505,14 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 		$this->start_controls_tab(
 			'tab_field_focus',
 			array(
-				'label' => __( 'Focus', 'textdomain' ),
+				'label' => __( 'Focus', 'themeisle-companion' ),
 			)
 		);
 
 		$this->add_control(
 			'field_focus_text_color',
 			array(
-				'label'     => __( 'Text Color', 'textdomain' ),
+				'label'     => __( 'Text Color', 'themeisle-companion' ),
 				'type'      => Controls_Manager::COLOR,
 				'selectors' => array(
 					'{{WRAPPER}} fieldset > input:focus' => 'color: {{VALUE}};',
@@ -510,8 +523,8 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 					'{{WRAPPER}} fieldset > textarea::placeholder:focus' => 'color: {{VALUE}};',
 				),
 				'scheme'    => array(
-					'type'  => Scheme_Color::get_type(),
-					'value' => Scheme_Color::COLOR_3,
+					'type'  => Color::get_type(),
+					'value' => Color::COLOR_3,
 				),
 			)
 		);
@@ -519,7 +532,7 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 		$this->add_control(
 			'field_focus_background_color',
 			array(
-				'label'     => __( 'Background Color', 'textdomain' ),
+				'label'     => __( 'Background Color', 'themeisle-companion' ),
 				'type'      => Controls_Manager::COLOR,
 				'default'   => '#ffffff',
 				'selectors' => array(
@@ -534,7 +547,7 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 		$this->add_control(
 			'field_focus_border_color',
 			array(
-				'label'     => __( 'Border Color', 'textdomain' ),
+				'label'     => __( 'Border Color', 'themeisle-companion' ),
 				'type'      => Controls_Manager::COLOR,
 				'selectors' => array(
 					'{{WRAPPER}} fieldset > input:focus' => 'border-color: {{VALUE}};',
@@ -548,15 +561,15 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 		$this->add_control(
 			'field_focus_border_style',
 			array(
-				'label'     => _x( 'Border Type', 'Border Control', 'textdomain' ),
+				'label'     => _x( 'Border Type', 'Border Control', 'themeisle-companion' ),
 				'type'      => Controls_Manager::SELECT,
 				'options'   => array(
-					''       => __( 'None', 'textdomain' ),
-					'solid'  => _x( 'Solid', 'Border Control', 'textdomain' ),
-					'double' => _x( 'Double', 'Border Control', 'textdomain' ),
-					'dotted' => _x( 'Dotted', 'Border Control', 'textdomain' ),
-					'dashed' => _x( 'Dashed', 'Border Control', 'textdomain' ),
-					'groove' => _x( 'Groove', 'Border Control', 'textdomain' ),
+					''       => __( 'None', 'themeisle-companion' ),
+					'solid'  => _x( 'Solid', 'Border Control', 'themeisle-companion' ),
+					'double' => _x( 'Double', 'Border Control', 'themeisle-companion' ),
+					'dotted' => _x( 'Dotted', 'Border Control', 'themeisle-companion' ),
+					'dashed' => _x( 'Dashed', 'Border Control', 'themeisle-companion' ),
+					'groove' => _x( 'Groove', 'Border Control', 'themeisle-companion' ),
 				),
 				'selectors' => array(
 					'{{WRAPPER}} fieldset > input:focus' => 'border-style: {{VALUE}};',
@@ -569,7 +582,7 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 		$this->add_control(
 			'field_focus_border_width',
 			array(
-				'label'       => __( 'Border Width', 'textdomain' ),
+				'label'       => __( 'Border Width', 'themeisle-companion' ),
 				'type'        => Controls_Manager::DIMENSIONS,
 				'placeholder' => '',
 				'size_units'  => array( 'px' ),
@@ -584,7 +597,7 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 		$this->add_control(
 			'field_focus_border_radius',
 			array(
-				'label'      => __( 'Border Radius', 'textdomain' ),
+				'label'      => __( 'Border Radius', 'themeisle-companion' ),
 				'type'       => Controls_Manager::DIMENSIONS,
 				'size_units' => array( 'px', '%' ),
 				'selectors'  => array(
@@ -604,7 +617,7 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 		$this->start_controls_section(
 			'section_button_style',
 			array(
-				'label' => __( 'Button', 'textdomain' ),
+				'label' => __( 'Button', 'themeisle-companion' ),
 				'tab'   => Controls_Manager::TAB_STYLE,
 			)
 		);
@@ -614,18 +627,18 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 		$this->start_controls_tab(
 			'tab_button_normal',
 			array(
-				'label' => __( 'Normal', 'textdomain' ),
+				'label' => __( 'Normal', 'themeisle-companion' ),
 			)
 		);
 
 		$this->add_control(
 			'button_background_color',
 			array(
-				'label'     => __( 'Background Color', 'textdomain' ),
+				'label'     => __( 'Background Color', 'themeisle-companion' ),
 				'type'      => Controls_Manager::COLOR,
 				'scheme'    => array(
-					'type'  => Scheme_Color::get_type(),
-					'value' => Scheme_Color::COLOR_4,
+					'type'  => Color::get_type(),
+					'value' => Color::COLOR_4,
 				),
 				'selectors' => array(
 					'{{WRAPPER}} fieldset > button' => 'background-color: {{VALUE}};',
@@ -636,7 +649,7 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 		$this->add_control(
 			'button_text_color',
 			array(
-				'label'     => __( 'Text Color', 'textdomain' ),
+				'label'     => __( 'Text Color', 'themeisle-companion' ),
 				'type'      => Controls_Manager::COLOR,
 				'default'   => '',
 				'selectors' => array(
@@ -649,7 +662,7 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 			Group_Control_Typography::get_type(),
 			array(
 				'name'     => 'button_typography',
-				'scheme'   => Scheme_Typography::TYPOGRAPHY_4,
+				'scheme'   => Typography::TYPOGRAPHY_4,
 				'selector' => '{{WRAPPER}} fieldset > button',
 			)
 		);
@@ -668,7 +681,7 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 		$this->add_control(
 			'button_border_radius',
 			array(
-				'label'      => __( 'Border Radius', 'textdomain' ),
+				'label'      => __( 'Border Radius', 'themeisle-companion' ),
 				'type'       => Controls_Manager::DIMENSIONS,
 				'size_units' => array( 'px', '%' ),
 				'selectors'  => array(
@@ -680,7 +693,7 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 		$this->add_control(
 			'button_text_padding',
 			array(
-				'label'      => __( 'Text Padding', 'textdomain' ),
+				'label'      => __( 'Text Padding', 'themeisle-companion' ),
 				'type'       => Controls_Manager::DIMENSIONS,
 				'size_units' => array( 'px', 'em', '%' ),
 				'selectors'  => array(
@@ -694,14 +707,14 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 		$this->start_controls_tab(
 			'tab_button_hover',
 			array(
-				'label' => __( 'Hover', 'textdomain' ),
+				'label' => __( 'Hover', 'themeisle-companion' ),
 			)
 		);
 
 		$this->add_control(
 			'button_background_hover_color',
 			array(
-				'label'     => __( 'Background Color', 'textdomain' ),
+				'label'     => __( 'Background Color', 'themeisle-companion' ),
 				'type'      => Controls_Manager::COLOR,
 				'selectors' => array(
 					'{{WRAPPER}} fieldset > button:hover' => 'background-color: {{VALUE}};',
@@ -712,7 +725,7 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 		$this->add_control(
 			'button_hover_color',
 			array(
-				'label'     => __( 'Text Color', 'textdomain' ),
+				'label'     => __( 'Text Color', 'themeisle-companion' ),
 				'type'      => Controls_Manager::COLOR,
 				'selectors' => array(
 					'{{WRAPPER}} fieldset > button:hover' => 'color: {{VALUE}};',
@@ -723,7 +736,7 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 		$this->add_control(
 			'button_hover_border_color',
 			array(
-				'label'     => __( 'Border Color', 'textdomain' ),
+				'label'     => __( 'Border Color', 'themeisle-companion' ),
 				'type'      => Controls_Manager::COLOR,
 				'selectors' => array(
 					'{{WRAPPER}} fieldset > button:hover' => 'border-color: {{VALUE}};',
@@ -743,7 +756,7 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 		$this->start_controls_section(
 			'notification_style',
 			array(
-				'label' => __( 'Notification', 'textdomain' ),
+				'label' => __( 'Notification', 'themeisle-companion' ),
 				'tab'   => Controls_Manager::TAB_STYLE,
 			)
 		);
@@ -751,7 +764,7 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 		$this->add_responsive_control(
 			'notification_margin',
 			array(
-				'label'      => __( 'Margin', 'textdomain' ),
+				'label'      => __( 'Margin', 'themeisle-companion' ),
 				'type'       => Controls_Manager::DIMENSIONS,
 				'size_units' => array( 'px', 'em', '%' ),
 				'selectors'  => array(
@@ -763,7 +776,7 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 		$this->add_responsive_control(
 			'notification_text_padding',
 			array(
-				'label'      => __( 'Padding', 'textdomain' ),
+				'label'      => __( 'Padding', 'themeisle-companion' ),
 				'type'       => Controls_Manager::DIMENSIONS,
 				'size_units' => array( 'px', 'em', '%' ),
 				'selectors'  => array(
@@ -775,7 +788,7 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 		$this->add_responsive_control(
 			'notification_width',
 			array(
-				'label'     => __( 'Width', 'textdomain' ),
+				'label'     => __( 'Width', 'themeisle-companion' ),
 				'type'      => Controls_Manager::SLIDER,
 				'unit'      => '%',
 				'range'     => array(
@@ -798,7 +811,7 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 			array(
 				'name'     => 'notification_typography',
 				'selector' => '{{WRAPPER}} .content-form-notice',
-				'scheme'   => Scheme_Typography::TYPOGRAPHY_3,
+				'scheme'   => Typography::TYPOGRAPHY_3,
 			)
 		);
 
@@ -806,7 +819,7 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 			Group_Control_Box_Shadow::get_type(),
 			array(
 				'name'     => 'notification_box_shadow',
-				'label'    => __( 'Box Shadow', 'textdomain' ),
+				'label'    => __( 'Box Shadow', 'themeisle-companion' ),
 				'selector' => '{{WRAPPER}} .content-form-notice',
 			)
 		);
@@ -814,21 +827,21 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 		$this->add_responsive_control(
 			'notification_alignment',
 			array(
-				'label'   => __( 'Alignment', 'textdomain' ),
+				'label'   => __( 'Alignment', 'themeisle-companion' ),
 				'type'    => Controls_Manager::CHOOSE,
 				'toggle'  => false,
 				'default' => 'left',
 				'options' => array(
 					'left'   => array(
-						'title' => __( 'Left', 'textdomain' ),
+						'title' => __( 'Left', 'themeisle-companion' ),
 						'icon'  => 'fa fa-align-left',
 					),
 					'center' => array(
-						'title' => __( 'Center', 'textdomain' ),
+						'title' => __( 'Center', 'themeisle-companion' ),
 						'icon'  => 'fa fa-align-center',
 					),
 					'right'  => array(
-						'title' => __( 'Right', 'textdomain' ),
+						'title' => __( 'Right', 'themeisle-companion' ),
 						'icon'  => 'fa fa-align-right',
 					),
 				),
@@ -840,14 +853,14 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 		$this->start_controls_tab(
 			'tab_notification_success',
 			array(
-				'label' => __( 'Success', 'textdomain' ),
+				'label' => __( 'Success', 'themeisle-companion' ),
 			)
 		);
 
 		$this->add_control(
 			'notification_background_color_success',
 			array(
-				'label'     => __( 'Background Color', 'textdomain' ),
+				'label'     => __( 'Background Color', 'themeisle-companion' ),
 				'type'      => Controls_Manager::COLOR,
 				'selectors' => array(
 					'{{WRAPPER}} .content-form-notice.content-form-success'    => 'background-color: {{VALUE}};',
@@ -858,7 +871,7 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 		$this->add_control(
 			'notification_text_color_success',
 			array(
-				'label'     => __( 'Text Color', 'textdomain' ),
+				'label'     => __( 'Text Color', 'themeisle-companion' ),
 				'type'      => Controls_Manager::COLOR,
 				'selectors' => array(
 					'{{WRAPPER}} .content-form-notice.content-form-success'    => 'color: {{VALUE}};',
@@ -870,7 +883,7 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 			Group_Control_Border::get_type(),
 			array(
 				'name'     => 'notification_border_success',
-				'label'    => __( 'Border', 'textdomain' ),
+				'label'    => __( 'Border', 'themeisle-companion' ),
 				'selector' => '{{WRAPPER}} .content-form-notice.content-form-success',
 			)
 		);
@@ -880,14 +893,14 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 		$this->start_controls_tab(
 			'tab_notification_error',
 			array(
-				'label' => __( 'Error', 'textdomain' ),
+				'label' => __( 'Error', 'themeisle-companion' ),
 			)
 		);
 
 		$this->add_control(
 			'notification_background_color_error',
 			array(
-				'label'     => __( 'Background Color', 'textdomain' ),
+				'label'     => __( 'Background Color', 'themeisle-companion' ),
 				'type'      => Controls_Manager::COLOR,
 				'selectors' => array(
 					'{{WRAPPER}} .content-form-notice.content-form-error'    => 'background-color: {{VALUE}};',
@@ -898,7 +911,7 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 		$this->add_control(
 			'notification_text_color_error',
 			array(
-				'label'     => __( 'Text Color', 'textdomain' ),
+				'label'     => __( 'Text Color', 'themeisle-companion' ),
 				'type'      => Controls_Manager::COLOR,
 				'selectors' => array(
 					'{{WRAPPER}} .content-form-notice.content-form-error'    => 'color: {{VALUE}};',
@@ -910,7 +923,7 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 			Group_Control_Border::get_type(),
 			array(
 				'name'     => 'notification_border_error',
-				'label'    => __( 'Border', 'textdomain' ),
+				'label'    => __( 'Border', 'themeisle-companion' ),
 				'selector' => '{{WRAPPER}} .content-form-notice.content-form-error',
 			)
 		);
@@ -940,7 +953,7 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 			$this->render_form_field( $field );
 		}
 
-		$btn_label = ! empty( $settings['submit_label'] ) ? $settings['submit_label'] : esc_html__( 'Submit', 'textdomain' );
+		$btn_label = ! empty( $settings['submit_label'] ) ? $settings['submit_label'] : esc_html__( 'Submit', 'themeisle-companion' );
 		echo '<fieldset class="submit-form ' . esc_attr( $this->get_widget_type() ) . '">';
 		echo '<button type="submit" name="submit" ' . $disabled . ' value="submit-' . esc_attr( $this->get_widget_type() ) . '-' . esc_attr( $form_id ) . '" class="' . $this->get_render_attribute_string( 'button' ) . '">';
 		echo esc_html( $btn_label );
@@ -976,8 +989,8 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 			if ( array_key_exists( 'access_key', $settings ) && empty( $settings['access_key'] ) ) {
 				echo '<p>';
 				printf(
-					esc_html__( 'The %s setting is required!', 'textdomain' ),
-					'<strong>' . esc_html__( 'Access Key', 'textdomain' ) . '</strong>'
+					esc_html__( 'The %s setting is required!', 'themeisle-companion' ),
+					'<strong>' . esc_html__( 'Access Key', 'themeisle-companion' ) . '</strong>'
 				);
 				echo '</p>';
 				$has_error = true;
@@ -986,8 +999,8 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 			if ( array_key_exists( 'list_id', $settings ) && empty( $settings['list_id'] ) ) {
 				echo '<p>';
 				printf(
-					esc_html__( 'The %s setting is required!', 'textdomain' ),
-					'<strong>' . esc_html__( 'List id', 'textdomain' ) . '</strong>'
+					esc_html__( 'The %s setting is required!', 'themeisle-companion' ),
+					'<strong>' . esc_html__( 'List id', 'themeisle-companion' ) . '</strong>'
 				);
 				echo '</p>';
 				$has_error = true;
@@ -1000,7 +1013,7 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 				if ( in_array( $field_map, $mapping, true ) ) {
 					echo '<p>';
 					printf(
-						esc_html__( 'The %s field is mapped to multiple form fields. Please check your field settings.', 'textdomain' ),
+						esc_html__( 'The %s field is mapped to multiple form fields. Please check your field settings.', 'themeisle-companion' ),
 						'<strong>' . $field_map . '</strong>'
 					);
 					echo '</p>';
@@ -1020,8 +1033,8 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 			if ( array_key_exists( 'to_send_email', $settings ) && empty( $settings['to_send_email'] ) ) {
 				echo '<p>';
 				printf(
-					esc_html__( 'The %s setting is required!', 'textdomain' ),
-					'<strong>' . esc_html__( 'Send to Email Address', 'textdomain' ) . '</strong>'
+					esc_html__( 'The %s setting is required!', 'themeisle-companion' ),
+					'<strong>' . esc_html__( 'Send to Email Address', 'themeisle-companion' ) . '</strong>'
 				);
 				echo '</p>';
 				$has_error = true;
@@ -1084,11 +1097,11 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 		$style = $this->get_notice_style();
 
 		echo '<div class="content-form-notice-wrapper">';
-		echo '<h3 ' . $style . ' class="content-form-notice content-form-success">' . __( 'This is a preview of how the success notification will look', 'textdomain' ) . '</h3>';
+		echo '<h3 ' . $style . ' class="content-form-notice content-form-success">' . __( 'This is a preview of how the success notification will look', 'themeisle-companion' ) . '</h3>';
 		echo '</div>';
 
 		echo '<div class="content-form-notice-wrapper">';
-		echo '<h3 ' . $style . ' class="content-form-notice content-form-error">' . __( 'This is a preview of how the error notification will look', 'textdomain' ) . '</h3>';
+		echo '<h3 ' . $style . ' class="content-form-notice content-form-error">' . __( 'This is a preview of how the error notification will look', 'themeisle-companion' ) . '</h3>';
 		echo '</div>';
 
 		return true;
@@ -1154,6 +1167,19 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 				break;
 			case 'password':
 				echo '<input type="password" name="' . esc_attr( $field_name ) . '" id="' . esc_attr( $field_name ) . '" ' . $required . ' ' . $disabled . '>';
+				break;
+			case 'hidden':
+				$hidden_field_value = $field['hidden_value'];
+				echo '<input type="hidden" value="' . esc_attr( $hidden_field_value ) . '" name="' . esc_attr( $field_name ) . '" id="' . esc_attr( $field_name ) . '" ' . $disabled . '>';
+				break;
+			case 'checkbox':
+				echo '<label class="checkbox-input" for="' . esc_attr( $field_name ) . '" ' . $this->get_render_attribute_string( 'label' . $field_id ) . '>';
+				echo wp_kses_post( $field['label'] );
+				if ( $field['requirement'] === 'required' ) {
+					echo '<span class="required-mark"> *</span>';
+				}
+				echo '<input type="checkbox" name="' . esc_attr( $field_name ) . '" id="' . esc_attr( $field_name ) . '" ' . $required . ' ' . $disabled . '>';
+				echo '</label>';
 				break;
 			default:
 				echo '<input type="text" name="' . esc_attr( $field_name ) . '" id="' . esc_attr( $field_name ) . '" ' . $required . ' ' . $disabled . ' placeholder="' . esc_attr( $placeholder ) . '">';
@@ -1221,6 +1247,9 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 	 */
 	private function render_field_label( $field ) {
 
+		if ( $field['type'] === 'hidden' || $field['type'] === 'checkbox' ) {
+			return false;
+		}
 		$settings      = $this->get_settings();
 		$display_label = $settings['hide_label'];
 		$field_id      = $field['_id'];
@@ -1284,4 +1313,11 @@ abstract class Elementor_Widget_Base extends Widget_Base {
 	 * Add widget specific settings controls.
 	 */
 	abstract function add_specific_settings_controls();
+
+	/**
+	 * Get allowed field types.
+	 *
+	 * @return array
+	 */
+	abstract function get_specific_field_types();
 }
